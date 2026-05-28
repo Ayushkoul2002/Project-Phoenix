@@ -64,7 +64,7 @@ const LoginScreen = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6 relative overflow-hidden font-sans select-none">
+    <div className="min-h-screen bg-gradient-to-tr from-slate-50 via-white to-emerald-50/20 flex items-center justify-center p-6 relative overflow-hidden font-sans select-none">
       {/* Background Radial Glow */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-cyan-500/5 rounded-full blur-[140px]" />
       
@@ -79,29 +79,29 @@ const LoginScreen = () => {
           <motion.div
             animate={{ scale: [1, 1.05, 1] }}
             transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-            className="w-13 h-13 rounded-full bg-gradient-to-br from-cyan-400 to-emerald-400 flex items-center justify-center shadow-lg shadow-cyan-500/20 mb-3"
+            className="w-13 h-13 rounded-full bg-gradient-to-br from-cyan-500 to-emerald-500 flex items-center justify-center shadow-lg shadow-cyan-500/20 mb-3"
           >
             <IoFlame size={26} className="text-white" />
           </motion.div>
-          <h1 className="text-3xl font-black tracking-widest text-white uppercase">
+          <h1 className="text-3xl font-black tracking-widest text-slate-900 uppercase">
             PHOENIX
           </h1>
-          <p className="text-slate-400 text-[10px] font-bold mt-1 tracking-[0.25em] uppercase">
+          <p className="text-slate-500 text-[10px] font-bold mt-1 tracking-[0.25em] uppercase">
             CRUSH TARGETS • CRUSH GOALS
           </p>
         </div>
 
         {/* Form Card */}
-        <div className="bg-slate-850 border border-slate-750 rounded-3xl p-6 shadow-2xl">
+        <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-2xl">
           {/* Mode Switch Tab Bar */}
-          <div className="flex mb-6 bg-slate-900 rounded-2xl p-1 border border-slate-800">
+          <div className="flex mb-6 bg-slate-100 rounded-2xl p-1 border border-slate-200">
             <button
               type="button"
               onClick={() => { setIsSignup(false); setIsForgot(false); setError(''); setSuccessMsg(''); }}
               className={`flex-1 py-3 rounded-xl text-xs font-extrabold tracking-wider transition-all ${
                 !isSignup && !isForgot
-                  ? 'bg-cyan-500/20 text-cyan-300 shadow shadow-cyan-500/10 border border-cyan-400/20'
-                  : 'text-slate-500 hover:text-slate-350'
+                  ? 'bg-white text-cyan-600 shadow-sm border border-slate-200'
+                  : 'text-slate-400 hover:text-slate-600'
               }`}
             >
               SIGN IN
@@ -111,8 +111,8 @@ const LoginScreen = () => {
               onClick={() => { setIsSignup(true); setIsForgot(false); setError(''); setSuccessMsg(''); }}
               className={`flex-1 py-3 rounded-xl text-xs font-extrabold tracking-wider transition-all ${
                 isSignup
-                  ? 'bg-emerald-500/20 text-emerald-300 shadow shadow-emerald-500/10 border border-emerald-400/20'
-                  : 'text-slate-500 hover:text-slate-350'
+                  ? 'bg-white text-emerald-600 shadow-sm border border-slate-200'
+                  : 'text-slate-400 hover:text-slate-600'
               }`}
             >
               REGISTER
@@ -132,14 +132,14 @@ const LoginScreen = () => {
                   className="space-y-4"
                 >
                   <div className="space-y-1.5">
-                    <label className="block text-[10px] font-bold text-slate-400 tracking-wider uppercase">
+                    <label className="block text-[10px] font-bold text-slate-500 tracking-wider uppercase">
                       Your Email Address
                     </label>
-                    <div className="relative flex items-center bg-slate-900 border border-slate-750 rounded-xl px-3.5 py-3.5 focus-within:border-cyan-400 transition-all shadow-inner">
-                      <IoMail className="text-slate-500 mr-2.5 shrink-0" size={16} />
+                    <div className="relative flex items-center bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-3.5 focus-within:border-cyan-500 focus-within:bg-white transition-all shadow-inner">
+                      <IoMail className="text-slate-400 mr-2.5 shrink-0" size={16} />
                       <input
                         type="email" value={email} onChange={(e) => setEmail(e.target.value)} required
-                        className="flex-1 bg-transparent text-slate-100 text-sm focus:outline-none placeholder-slate-650"
+                        className="flex-1 bg-transparent text-slate-800 text-sm focus:outline-none placeholder-slate-400"
                         placeholder="Enter registered email..."
                       />
                     </div>
@@ -155,27 +155,27 @@ const LoginScreen = () => {
                   className="space-y-4"
                 >
                   <div className="space-y-1.5">
-                    <label className="block text-[10px] font-bold text-slate-400 tracking-wider uppercase">
+                    <label className="block text-[10px] font-bold text-slate-500 tracking-wider uppercase">
                       Email Address
                     </label>
-                    <div className="relative flex items-center bg-slate-900 border border-slate-750 rounded-xl px-3.5 py-3.5 focus-within:border-cyan-400 transition-all shadow-inner">
-                      <IoMail className="text-slate-500 mr-2.5 shrink-0" size={16} />
+                    <div className="relative flex items-center bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-3.5 focus-within:border-cyan-500 focus-within:bg-white transition-all shadow-inner">
+                      <IoMail className="text-slate-400 mr-2.5 shrink-0" size={16} />
                       <input
                         type="email" value={email} onChange={(e) => setEmail(e.target.value)} required
-                        className="flex-1 bg-transparent text-slate-100 text-sm focus:outline-none placeholder-slate-650"
+                        className="flex-1 bg-transparent text-slate-800 text-sm focus:outline-none placeholder-slate-400"
                         placeholder="Enter your email..."
                       />
                     </div>
                   </div>
                   <div className="space-y-1.5">
-                    <label className="block text-[10px] font-bold text-slate-400 tracking-wider uppercase">
+                    <label className="block text-[10px] font-bold text-slate-500 tracking-wider uppercase">
                       Password
                     </label>
-                    <div className="relative flex items-center bg-slate-900 border border-slate-750 rounded-xl px-3.5 py-3.5 focus-within:border-cyan-400 transition-all shadow-inner">
-                      <IoLockClosed className="text-slate-500 mr-2.5 shrink-0" size={16} />
+                    <div className="relative flex items-center bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-3.5 focus-within:border-cyan-500 focus-within:bg-white transition-all shadow-inner">
+                      <IoLockClosed className="text-slate-400 mr-2.5 shrink-0" size={16} />
                       <input
                         type="password" value={password} onChange={(e) => setPassword(e.target.value)} required
-                        className="flex-1 bg-transparent text-slate-100 text-sm focus:outline-none placeholder-slate-650"
+                        className="flex-1 bg-transparent text-slate-800 text-sm focus:outline-none placeholder-slate-400"
                         placeholder="••••••••••••"
                       />
                     </div>
@@ -189,7 +189,7 @@ const LoginScreen = () => {
               {error && (
                 <motion.div
                   initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
-                  className="bg-amber-500/10 border border-amber-500/20 rounded-xl px-4 py-3 text-amber-400 text-xs font-semibold leading-relaxed"
+                  className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-amber-700 text-xs font-semibold leading-relaxed"
                 >
                   ⚠ {error}
                 </motion.div>
@@ -197,7 +197,7 @@ const LoginScreen = () => {
               {successMsg && (
                 <motion.div
                   initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
-                  className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl px-4 py-3 text-emerald-400 text-xs font-semibold leading-relaxed"
+                  className="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 text-emerald-700 text-xs font-semibold leading-relaxed"
                 >
                   ✓ {successMsg}
                 </motion.div>
@@ -213,7 +213,7 @@ const LoginScreen = () => {
                   : isSignup
                   ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 text-white shadow shadow-emerald-500/15'
                   : 'bg-gradient-to-r from-cyan-600 to-cyan-500 text-white shadow shadow-cyan-500/15'
-              } disabled:opacity-50 min-h-[48px] uppercase`}
+              } disabled:opacity-50 min-h-[48px] uppercase cursor-pointer`}
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
@@ -234,26 +234,26 @@ const LoginScreen = () => {
           </form>
 
           {/* Toggle Footers */}
-          <div className="mt-6 pt-4 border-t border-slate-750 text-center">
+          <div className="mt-6 pt-4 border-t border-slate-100 text-center">
             {isForgot ? (
-              <p className="text-slate-400 text-xs font-medium">
+              <p className="text-slate-500 text-xs font-medium">
                 REMEMBERED CIPHER?{' '}
                 <button
                   type="button"
                   onClick={() => { setIsForgot(false); setError(''); setSuccessMsg(''); }}
-                  className="text-cyan-400 hover:text-cyan-300 font-bold ml-1 transition-colors"
+                  className="text-cyan-600 hover:text-cyan-500 font-bold ml-1 transition-colors cursor-pointer"
                 >
                   SIGN IN
                 </button>
               </p>
             ) : (
               <div className="space-y-3.5">
-                <p className="text-slate-400 text-xs font-medium">
+                <p className="text-slate-500 text-xs font-medium">
                   {isSignup ? 'ALREADY REGISTERED?' : 'NEW ATHLETE?'}{' '}
                   <button
                     type="button"
                     onClick={() => { setIsSignup(!isSignup); setError(''); setSuccessMsg(''); }}
-                    className="text-cyan-400 hover:text-cyan-300 font-bold ml-1 transition-colors"
+                    className="text-cyan-600 hover:text-cyan-500 font-bold ml-1 transition-colors cursor-pointer"
                   >
                     {isSignup ? 'SIGN IN' : 'REGISTER'}
                   </button>
@@ -262,7 +262,7 @@ const LoginScreen = () => {
                   <button
                     type="button"
                     onClick={() => { setIsForgot(true); setError(''); setSuccessMsg(''); }}
-                    className="text-[11px] font-bold text-slate-500 hover:text-cyan-400 transition-colors block mx-auto underline tracking-wider uppercase"
+                    className="text-[11px] font-bold text-slate-400 hover:text-cyan-600 transition-colors block mx-auto underline tracking-wider uppercase cursor-pointer"
                   >
                     FORGOT PASSWORD?
                   </button>
@@ -271,7 +271,7 @@ const LoginScreen = () => {
             )}
 
             {/* Warm Motivational Quote Centerpiece */}
-            <div className="mt-6 text-center italic text-xs text-slate-400 max-w-xs mx-auto border-t border-slate-800/40 pt-4 leading-relaxed font-semibold">
+            <div className="mt-6 text-center italic text-xs text-slate-500 max-w-xs mx-auto border-t border-slate-100 pt-4 leading-relaxed font-semibold">
               "{quote}"
             </div>
           </div>

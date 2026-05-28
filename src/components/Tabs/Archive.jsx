@@ -13,13 +13,11 @@ import {
 } from 'recharts';
 import { subscribeWeightLogs, addWeightLog, deleteWeightLog, subscribeAllFoodLogs } from '../../firebase/firestoreService';
 
-
-
 const WeightTooltip = ({ active, payload, label }) => {
   if (active && payload?.[0]) return (
-    <div className="bg-slate-800 border border-slate-600/50 rounded-lg px-3 py-1.5 shadow-xl">
-      <p className="text-[8px] font-mono text-slate-400">{label}</p>
-      <p className="text-sm font-mono font-bold text-emerald-400">{payload[0].value} kg</p>
+    <div className="bg-white border border-slate-200 rounded-xl px-3 py-1.5 shadow-md">
+      <p className="text-[8px] font-bold text-slate-400">{label}</p>
+      <p className="text-sm font-black text-emerald-600">{payload[0].value} kg</p>
     </div>
   );
   return null;
@@ -27,9 +25,9 @@ const WeightTooltip = ({ active, payload, label }) => {
 
 const CalTooltip = ({ active, payload, label }) => {
   if (active && payload?.[0]) return (
-    <div className="bg-slate-800 border border-slate-600/50 rounded-lg px-3 py-1.5 shadow-xl">
-      <p className="text-[8px] font-mono text-slate-400">{label}</p>
-      <p className="text-sm font-mono font-bold text-amber-400">{payload[0].value} kcal</p>
+    <div className="bg-white border border-slate-200 rounded-xl px-3 py-1.5 shadow-md">
+      <p className="text-[8px] font-bold text-slate-400">{label}</p>
+      <p className="text-sm font-black text-amber-600">{payload[0].value} kcal</p>
     </div>
   );
   return null;
@@ -108,81 +106,84 @@ const Archive = ({ uid, profile }) => {
   const daysHit = Object.values(dailyCals).filter((c) => c >= calorieTarget).length;
 
   return (
-    <div className="px-4 pt-3 pb-6 max-w-lg mx-auto">
+    <div className="px-6 pt-5 pb-8 max-w-lg mx-auto font-sans">
       {/* Header */}
-      <div className="mb-3">
-        <h2 className="text-base font-bold font-mono tracking-[0.15em] text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-cyan-400">PROGRESS</h2>
-        <p className="text-[8px] font-mono text-slate-600 tracking-wider mt-0.5">CHALLENGE ANALYTICS & WEIGHT LOG</p>
+      <div className="mb-4">
+        <h2 className="text-xl font-black tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-br from-fuchsia-600 to-cyan-600 uppercase">PROGRESS</h2>
+        <p className="text-[9px] font-bold text-slate-450 tracking-wider mt-2 uppercase">CHALLENGE ANALYTICS & WEIGHT LOG</p>
       </div>
 
       {/* Challenge Timeline */}
-      <div className="bg-slate-900/60 border border-slate-800/50 rounded-xl p-2.5 mb-2.5">
-        <div className="flex justify-between mb-1">
-          <span className="text-[8px] font-mono text-slate-400">CHALLENGE</span>
-          <span className="text-[8px] font-mono text-cyan-400">DAY {daysSince} / {totalDays}</span>
+      <div className="bg-white border border-slate-200 rounded-3xl p-5 mb-5 shadow-sm">
+        <div className="flex justify-between mb-1.5 items-center">
+          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">CHALLENGE TIMELINE</span>
+          <span className="text-[10px] font-bold text-cyan-600">DAY {daysSince} / {totalDays}</span>
         </div>
-        <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
+        <div className="h-2.5 bg-slate-100 rounded-full overflow-hidden border border-slate-200/50">
           <motion.div className="h-full rounded-full bg-gradient-to-r from-cyan-600 to-fuchsia-500" initial={{ width: 0 }} animate={{ width: `${challengePct}%` }} transition={{ duration: 1 }} />
         </div>
-        <div className="flex justify-between mt-0.5">
-          <span className="text-[7px] font-mono text-slate-600">{challengeStart.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }).toUpperCase()}</span>
-          <span className="text-[7px] font-mono text-slate-600">{daysLeft}d left</span>
-          <span className="text-[7px] font-mono text-slate-600">{challengeEnd.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }).toUpperCase()}</span>
+        <div className="flex justify-between mt-2.5">
+          <span className="text-[8px] font-bold text-slate-450">{challengeStart.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }).toUpperCase()}</span>
+          <span className="text-[8px] font-extrabold text-cyan-600">{daysLeft} DAYS LEFT</span>
+          <span className="text-[8px] font-bold text-slate-455">{challengeEnd.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }).toUpperCase()}</span>
         </div>
       </div>
 
       {/* Weight Progress */}
-      <div className="bg-slate-900/60 border border-slate-800/50 rounded-xl p-2.5 mb-2.5">
-        <div className="flex items-end gap-2 mb-1.5">
-          <IoScale className="text-emerald-400 shrink-0" size={14} />
-          <span className="text-xl font-bold font-mono text-emerald-400">{latestWeight}</span>
-          <span className="text-[10px] font-mono text-slate-500 mb-0.5">kg</span>
-          <span className={`text-[10px] font-mono font-bold mb-0.5 ml-auto ${Number(totalGain) >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-            {Number(totalGain) >= 0 ? '▲' : '▼'}{Math.abs(Number(totalGain))}kg
+      <div className="bg-white border border-slate-200 rounded-3xl p-5 mb-5 shadow-sm">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">WEIGHT MASS TRACKER</span>
+          <span className={`text-[10px] font-black px-2 py-0.5 rounded-md ${Number(totalGain) >= 0 ? 'text-emerald-700 bg-emerald-50 border border-emerald-250' : 'text-red-700 bg-red-50 border border-red-250'}`}>
+            {Number(totalGain) >= 0 ? '▲' : '▼'} {Math.abs(Number(totalGain))} KG DELTA
           </span>
         </div>
-        <div className="h-2 bg-slate-800 rounded-full overflow-hidden mb-0.5">
+        <div className="flex items-end gap-1.5 mb-3">
+          <IoScale className="text-emerald-600 shrink-0" size={18} />
+          <span className="text-2xl font-black text-slate-900 leading-none">{latestWeight}</span>
+          <span className="text-xs font-bold text-slate-400 mb-0.5">kg current</span>
+        </div>
+        <div className="h-2.5 bg-slate-100 rounded-full overflow-hidden border border-slate-200/50 mb-2.5">
           <motion.div className="h-full rounded-full bg-gradient-to-r from-emerald-600 to-emerald-400" initial={{ width: 0 }} animate={{ width: `${weightPct}%` }} transition={{ duration: 1 }} />
         </div>
         <div className="flex justify-between">
-          <span className="text-[7px] font-mono text-slate-600">{weightStart}kg</span>
-          <span className="text-[7px] font-mono text-slate-600">{weightToGo}kg to go</span>
-          <span className="text-[7px] font-mono text-slate-600">{weightGoal}kg</span>
+          <span className="text-[8px] font-bold text-slate-450">{weightStart}kg start</span>
+          <span className="text-[8px] font-extrabold text-emerald-600">{weightToGo}kg to reach goal</span>
+          <span className="text-[8px] font-bold text-slate-455">{weightGoal}kg goal</span>
         </div>
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-3 gap-1.5 mb-2.5">
-        <div className="bg-slate-900/60 border border-slate-800/40 rounded-xl p-2 text-center">
-          <span className="text-[7px] font-mono text-slate-500 block">AVG/DAY</span>
-          <span className="text-sm font-bold font-mono text-amber-400">{avgDaily}</span>
-          <span className="text-[7px] font-mono text-slate-600 block">kcal</span>
+      <div className="grid grid-cols-3 gap-3 mb-5">
+        <div className="bg-white border border-slate-200 rounded-2xl p-3.5 text-center shadow-sm">
+          <span className="text-[8px] font-bold text-slate-400 block uppercase tracking-wider">AVG DAILY</span>
+          <span className="text-base font-black text-amber-600 block mt-1 leading-none">{avgDaily}</span>
+          <span className="text-[8px] font-bold text-slate-450 block mt-1">kcal</span>
         </div>
-        <div className="bg-slate-900/60 border border-slate-800/40 rounded-xl p-2 text-center">
-          <span className="text-[7px] font-mono text-slate-500 block">TARGET HIT</span>
-          <span className="text-sm font-bold font-mono text-emerald-400">{daysHit}</span>
-          <span className="text-[7px] font-mono text-slate-600 block">days</span>
+        <div className="bg-white border border-slate-200 rounded-2xl p-3.5 text-center shadow-sm">
+          <span className="text-[8px] font-bold text-slate-400 block uppercase tracking-wider">TARGET HIT</span>
+          <span className="text-base font-black text-emerald-600 block mt-1 leading-none">{daysHit}</span>
+          <span className="text-[8px] font-bold text-slate-450 block mt-1">days</span>
         </div>
-        <div className="bg-slate-900/60 border border-slate-800/40 rounded-xl p-2 text-center">
-          <span className="text-[7px] font-mono text-slate-500 block">TOTAL</span>
-          <span className="text-sm font-bold font-mono text-cyan-400">{totalCalEver >= 1000 ? `${(totalCalEver/1000).toFixed(0)}k` : totalCalEver}</span>
-          <span className="text-[7px] font-mono text-slate-600 block">kcal</span>
+        <div className="bg-white border border-slate-200 rounded-2xl p-3.5 text-center shadow-sm">
+          <span className="text-[8px] font-bold text-slate-400 block uppercase tracking-wider">TOTAL FUEL</span>
+          <span className="text-base font-black text-cyan-600 block mt-1 leading-none">{totalCalEver >= 1000 ? `${(totalCalEver/1000).toFixed(0)}k` : totalCalEver}</span>
+          <span className="text-[8px] font-bold text-slate-450 block mt-1">kcal</span>
         </div>
       </div>
 
       {/* Weight Chart */}
       {weightChartData.length > 0 && (
-        <div className="bg-slate-900/60 border border-slate-800/50 rounded-xl p-2.5 mb-2.5">
-          <span className="text-[8px] font-mono text-slate-400 tracking-wider block mb-1">WEIGHT GRAPH</span>
+        <div className="bg-white border border-slate-200 rounded-3xl p-5 mb-5 shadow-sm">
+          <span className="text-[9px] font-bold text-slate-400 tracking-wider block uppercase mb-4">Weight History Graph</span>
           <ResponsiveContainer width="100%" height={140}>
-            <LineChart data={weightChartData} margin={{ top: 5, right: 5, bottom: 5, left: -18 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-              <XAxis dataKey="date" tick={{ fontSize: 8, fontFamily: 'monospace', fill: '#64748b' }} axisLine={{ stroke: '#334155' }} tickLine={false} />
-              <YAxis tick={{ fontSize: 8, fontFamily: 'monospace', fill: '#64748b' }} axisLine={{ stroke: '#334155' }} tickLine={false} domain={['dataMin - 1', 'dataMax + 1']} />
+            <LineChart data={weightChartData} margin={{ top: 5, right: 5, bottom: 5, left: -22 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <XAxis dataKey="date" tick={{ fontSize: 8, fontFamily: 'sans-serif', fontWeight: '600', fill: '#94a3b8' }} axisLine={{ stroke: '#cbd5e1' }} tickLine={false} />
+              <YAxis tick={{ fontSize: 8, fontFamily: 'sans-serif', fontWeight: '600', fill: '#94a3b8' }} axisLine={{ stroke: '#cbd5e1' }} tickLine={false} domain={['dataMin - 1', 'dataMax + 1']} />
               <Tooltip content={<WeightTooltip />} />
               <ReferenceLine y={weightGoal} stroke="#06b6d4" strokeDasharray="6 4" strokeWidth={1} />
-              <Line type="monotone" dataKey="weight" stroke="#10b981" strokeWidth={2} dot={{ r: 3, fill: '#10b981', stroke: '#0f172a', strokeWidth: 2 }}
-                style={{ filter: 'drop-shadow(0 0 4px rgba(16,185,129,0.5))' }} />
+              <Line type="monotone" dataKey="weight" stroke="#10b981" strokeWidth={2} dot={{ r: 3.5, fill: '#10b981', stroke: '#ffffff', strokeWidth: 2 }}
+                style={{ filter: 'drop-shadow(0 2px 6px rgba(16,185,129,0.2))' }} />
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -190,16 +191,16 @@ const Archive = ({ uid, profile }) => {
 
       {/* Calorie Chart */}
       {calChartData.length > 0 && (
-        <div className="bg-slate-900/60 border border-slate-800/50 rounded-xl p-2.5 mb-2.5">
-          <span className="text-[8px] font-mono text-slate-400 tracking-wider block mb-1">DAILY CALORIES</span>
-          <ResponsiveContainer width="100%" height={120}>
-            <AreaChart data={calChartData} margin={{ top: 5, right: 5, bottom: 5, left: -18 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-              <XAxis dataKey="date" tick={{ fontSize: 8, fontFamily: 'monospace', fill: '#64748b' }} axisLine={{ stroke: '#334155' }} tickLine={false} />
-              <YAxis tick={{ fontSize: 8, fontFamily: 'monospace', fill: '#64748b' }} axisLine={{ stroke: '#334155' }} tickLine={false} />
+        <div className="bg-white border border-slate-200 rounded-3xl p-5 mb-5 shadow-sm">
+          <span className="text-[9px] font-bold text-slate-400 tracking-wider block uppercase mb-4">Daily Caloric Chronology</span>
+          <ResponsiveContainer width="100%" height={130}>
+            <AreaChart data={calChartData} margin={{ top: 5, right: 5, bottom: 5, left: -22 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <XAxis dataKey="date" tick={{ fontSize: 8, fontFamily: 'sans-serif', fontWeight: '600', fill: '#94a3b8' }} axisLine={{ stroke: '#cbd5e1' }} tickLine={false} />
+              <YAxis tick={{ fontSize: 8, fontFamily: 'sans-serif', fontWeight: '600', fill: '#94a3b8' }} axisLine={{ stroke: '#cbd5e1' }} tickLine={false} />
               <Tooltip content={<CalTooltip />} />
               <ReferenceLine y={calorieTarget} stroke="#f59e0b" strokeDasharray="6 4" strokeWidth={1} />
-              <defs><linearGradient id="calG" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#f59e0b" stopOpacity={0.3} /><stop offset="95%" stopColor="#f59e0b" stopOpacity={0.02} /></linearGradient></defs>
+              <defs><linearGradient id="calG" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#f59e0b" stopOpacity={0.2} /><stop offset="95%" stopColor="#f59e0b" stopOpacity={0.01} /></linearGradient></defs>
               <Area type="monotone" dataKey="calories" stroke="#f59e0b" strokeWidth={1.5} fill="url(#calG)" />
             </AreaChart>
           </ResponsiveContainer>
@@ -207,13 +208,13 @@ const Archive = ({ uid, profile }) => {
       )}
 
       {/* Weight Log Input */}
-      <form onSubmit={handleLogWeight} className="bg-slate-900/60 border border-slate-800/50 rounded-xl p-2.5 mb-2.5">
-        <span className="text-[8px] font-mono text-slate-400 tracking-wider block mb-1.5">LOG WEIGHT</span>
+      <form onSubmit={handleLogWeight} className="bg-white border border-slate-200 rounded-3xl p-5 mb-5 shadow-sm">
+        <span className="text-[9px] font-bold text-slate-450 tracking-wider block uppercase mb-2">LOG DAILY WEIGHT</span>
         <div className="flex gap-2">
-          <input type="number" step="0.1" min="0" value={weightInput} onChange={(e) => setWeightInput(e.target.value)} placeholder="kg..." required
-            className="flex-1 min-w-0 bg-slate-800/60 border border-slate-600/30 rounded-lg px-3 py-2.5 text-sm font-mono text-slate-200 placeholder-slate-600 focus:outline-none focus:border-cyan-500/40 box-border" />
+          <input type="number" step="0.1" min="0" value={weightInput} onChange={(e) => setWeightInput(e.target.value)} placeholder="Enter kg (e.g. 62.5)..." required
+            className="flex-1 min-w-0 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-sans text-slate-800 placeholder-slate-400 focus:outline-none focus:border-cyan-500 focus:bg-white box-border transition-all" />
           <motion.button type="submit" disabled={logging} whileTap={{ scale: 0.95 }}
-            className={`px-4 rounded-lg font-mono font-bold text-sm min-h-[44px] min-w-[44px] transition-all ${logSuccess ? 'bg-emerald-500 text-white' : 'bg-cyan-600/80 hover:bg-cyan-600 text-white'} disabled:opacity-50`}>
+            className={`px-5 rounded-xl font-bold text-sm min-h-[44px] min-w-[56px] transition-all cursor-pointer shadow-sm ${logSuccess ? 'bg-emerald-600 text-white shadow-emerald-500/10' : 'bg-cyan-600 hover:bg-cyan-500 text-white shadow-cyan-500/10'} disabled:opacity-50`}>
             {logSuccess ? '✓' : 'LOG'}
           </motion.button>
         </div>
@@ -221,32 +222,32 @@ const Archive = ({ uid, profile }) => {
 
       {/* Weight Log History (with DELETE) */}
       {weightLogs.length > 0 && (
-        <div className="bg-slate-900/60 border border-slate-800/50 rounded-xl p-2.5">
-          <span className="text-[8px] font-mono text-slate-400 tracking-wider block mb-1.5">WEIGHT HISTORY — TAP 🗑 TO DELETE</span>
-          <div className="space-y-1 max-h-[25vh] overflow-y-auto scrollbar-thin">
+        <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm">
+          <span className="text-[9px] font-bold text-slate-400 tracking-wider block uppercase mb-3">Weight History Log</span>
+          <div className="space-y-2 max-h-[25vh] overflow-y-auto scrollbar-thin pr-1">
             {[...weightLogs].reverse().map((log) => {
               const d = log.timestamp?.toDate ? log.timestamp.toDate() : new Date(log.timestamp);
               return (
-                <div key={log.id} className="flex items-center justify-between bg-slate-800/30 rounded-lg px-2.5 py-2 min-h-[40px]">
-                  <span className="text-[10px] font-mono text-slate-500">
+                <div key={log.id} className="flex items-center justify-between bg-slate-50 border border-slate-200/50 hover:border-slate-200 rounded-xl px-3.5 py-3 min-h-[44px] shadow-sm transition-all">
+                  <span className="text-[11px] font-bold text-slate-500 font-sans">
                     {d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
                   </span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-mono font-bold text-slate-300">{log.weight} kg</span>
+                  <div className="flex items-center gap-2.5">
+                    <span className="text-sm font-bold text-slate-800 font-sans">{log.weight} kg</span>
 
                     {/* Delete confirm */}
                     {confirmDelete === log.id ? (
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1.5">
                         <button onClick={() => handleDeleteWeight(log.id)} disabled={deleting === log.id}
-                          className="text-[8px] font-mono bg-red-500/20 text-red-400 border border-red-500/30 px-2 py-1 rounded hover:bg-red-500/30 transition-colors min-w-[40px]">
+                          className="text-[9px] font-bold bg-red-50 text-red-600 border border-red-200 px-2 py-1 rounded-lg hover:bg-red-100 transition-colors min-w-[40px] cursor-pointer">
                           {deleting === log.id ? '...' : 'YES'}
                         </button>
                         <button onClick={() => setConfirmDelete(null)}
-                          className="text-[8px] font-mono text-slate-500 px-1.5 py-1 rounded hover:text-slate-300">NO</button>
+                          className="text-[9px] font-bold text-slate-400 hover:text-slate-700 px-1.5 py-1 rounded cursor-pointer">NO</button>
                       </div>
                     ) : (
                       <button onClick={() => setConfirmDelete(log.id)}
-                        className="w-8 h-8 flex items-center justify-center text-slate-600 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all" aria-label="Delete">
+                        className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all cursor-pointer" aria-label="Delete">
                         <IoTrash size={13} />
                       </button>
                     )}

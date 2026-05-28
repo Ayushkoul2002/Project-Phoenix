@@ -42,8 +42,8 @@ input, select, textarea {
 
 body {
   font-family: 'Inter', system-ui, sans-serif;
-  background-color: #020617; /* slate-950 */
-  color: #cbd5e1; /* slate-300 */
+  background-color: #f8fafc; /* slate-50 */
+  color: #0f172a; /* slate-900 */
   margin: 0;
   padding: 0;
   overflow-x: hidden;
@@ -59,7 +59,7 @@ body {
 /* ─── Scrollbar Styling ────────────────────── */
 .scrollbar-thin {
   scrollbar-width: thin;
-  scrollbar-color: #334155 transparent;
+  scrollbar-color: #cbd5e1 transparent;
 }
 
 .scrollbar-thin::-webkit-scrollbar {
@@ -71,12 +71,12 @@ body {
 }
 
 .scrollbar-thin::-webkit-scrollbar-thumb {
-  background: #334155;
+  background: #cbd5e1;
   border-radius: 4px;
 }
 
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+  background: #94a3b8;
 }
 
 /* ─── Hide Scrollbar utility ───────────────── */
@@ -88,59 +88,25 @@ body {
   display: none; /* Chrome, Safari and Opera */
 }
 
-/* ─── Scanline Overlay Effect ──────────────── */
-.scanline-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  pointer-events: none;
-  z-index: 100;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(0, 0, 0, 0.03) 2px,
-    rgba(0, 0, 0, 0.03) 4px
-  );
-}
-
-/* ─── Overdrive Pulse Animation ────────────── */
-.overdrive-pulse {
-  animation: overdrivePulse 1.5s ease-in-out infinite;
-}
-
-@keyframes overdrivePulse {
-  0%, 100% {
-    opacity: 1;
-    text-shadow: 0 0 8px rgba(217, 70, 239, 0.6);
-  }
-  50% {
-    opacity: 0.7;
-    text-shadow: 0 0 20px rgba(217, 70, 239, 0.9), 0 0 40px rgba(217, 70, 239, 0.4);
-  }
-}
-
 /* ─── Glow Utilities ───────────────────────── */
 .glow-emerald {
-  box-shadow: 0 0 15px rgba(16, 185, 129, 0.3), 0 0 30px rgba(16, 185, 129, 0.1);
+  box-shadow: 0 4px 18px rgba(16, 185, 129, 0.12), 0 0 1px rgba(16, 185, 129, 0.3);
 }
 
 .glow-cyan {
-  box-shadow: 0 0 15px rgba(6, 182, 212, 0.3), 0 0 30px rgba(6, 182, 212, 0.1);
+  box-shadow: 0 4px 18px rgba(6, 182, 212, 0.12), 0 0 1px rgba(6, 182, 212, 0.3);
 }
 
 .glow-magenta {
-  box-shadow: 0 0 15px rgba(217, 70, 239, 0.3), 0 0 30px rgba(217, 70, 239, 0.1);
+  box-shadow: 0 4px 18px rgba(217, 70, 239, 0.12), 0 0 1px rgba(217, 70, 239, 0.3);
 }
 
 .glow-amber {
-  box-shadow: 0 0 15px rgba(245, 158, 11, 0.3), 0 0 30px rgba(245, 158, 11, 0.1);
+  box-shadow: 0 4px 18px rgba(245, 158, 11, 0.12), 0 0 1px rgba(245, 158, 11, 0.3);
 }
 
 /* ─── Selection ────────────────────────────── */
 ::selection {
-  background-color: rgba(6, 182, 212, 0.3);
-  color: #e2e8f0;
+  background-color: rgba(6, 182, 212, 0.15);
+  color: #0f172a;
 }

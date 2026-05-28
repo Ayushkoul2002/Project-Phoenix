@@ -59,7 +59,7 @@ const ManifestLog = ({ uid, selectedDate, setSelectedDate, profile }) => {
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (caloriePercent / 100) * circumference;
   const ringColor = isOverdrive ? '#d946ef' : '#10b981';
-  const ringGlow = isOverdrive ? '0 0 20px rgba(217,70,239,0.5)' : '0 0 14px rgba(16,185,129,0.4)';
+  const ringGlow = isOverdrive ? '0 3px 10px rgba(217,70,239,0.15)' : '0 3px 10px rgba(16,185,129,0.12)';
 
   const handleDelete = async (docId) => {
     setDeleting(docId);
@@ -112,38 +112,38 @@ const ManifestLog = ({ uid, selectedDate, setSelectedDate, profile }) => {
   const gridItems = [...blanks, ...days];
 
   return (
-    <div className="px-6 pt-5 pb-8 max-w-lg mx-auto">
+    <div className="px-6 pt-5 pb-8 max-w-lg mx-auto font-sans">
       {/* Header */}
       <div className="mb-4">
-        <h2 className="text-xl font-extrabold font-mono tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-emerald-400">
+        <h2 className="text-xl font-black tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-br from-amber-600 to-emerald-600 uppercase">
           MANIFEST LOG
         </h2>
         <div className="flex items-center gap-2 mt-2">
-          <span className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse" />
-          <span className="text-[9px] font-mono text-slate-500 tracking-wider uppercase">HISTORICAL CHRONICLES INDEX</span>
+          <span className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse shadow-sm" />
+          <span className="text-[9px] font-bold text-slate-450 tracking-wider uppercase">HISTORICAL CHRONICLES INDEX</span>
         </div>
       </div>
 
       {/* Date Navigation */}
-      <div className="flex items-center justify-between bg-slate-900/60 border border-slate-800/80 rounded-2xl px-2 py-1.5 mb-5 shadow-lg">
-        <button onClick={goToPrevDay} className="w-11 h-11 flex items-center justify-center text-slate-400 hover:text-cyan-400 active:scale-90 transition-all rounded-xl hover:bg-slate-800/40" aria-label="Previous day">
+      <div className="flex items-center justify-between bg-white border border-slate-200 rounded-3xl px-2.5 py-2 mb-5 shadow-sm">
+        <button onClick={goToPrevDay} className="w-11 h-11 flex items-center justify-center text-slate-500 hover:text-cyan-600 active:scale-90 transition-all rounded-xl hover:bg-slate-100 cursor-pointer" aria-label="Previous day">
           <IoChevronBack size={18} />
         </button>
-        <button onClick={toggleCalendar} className="flex items-center gap-2 px-4 py-2 text-xs font-mono font-bold text-slate-200 hover:text-cyan-400 bg-slate-950/60 border border-slate-850 hover:border-cyan-500/30 rounded-xl transition-all min-h-[44px] shadow-inner tracking-wider">
-          <IoCalendar size={14} className="text-cyan-400" />
+        <button onClick={toggleCalendar} className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-slate-800 hover:text-cyan-600 bg-slate-50 border border-slate-200 hover:border-cyan-400/50 rounded-xl transition-all min-h-[44px] shadow-inner tracking-wider cursor-pointer">
+          <IoCalendar size={14} className="text-cyan-605" />
           <span>{formatDateLabel(selectedDate)}</span>
         </button>
-        <button onClick={goToNextDay} className="w-11 h-11 flex items-center justify-center text-slate-400 hover:text-cyan-400 active:scale-90 transition-all rounded-xl hover:bg-slate-800/40" aria-label="Next day">
+        <button onClick={goToNextDay} className="w-11 h-11 flex items-center justify-center text-slate-500 hover:text-cyan-600 active:scale-90 transition-all rounded-xl hover:bg-slate-100 cursor-pointer" aria-label="Next day">
           <IoChevronForward size={18} />
         </button>
       </div>
 
       {/* Mini Ring + Summary */}
-      <div className="flex items-center gap-4 bg-slate-900/60 border border-slate-800/85 rounded-2xl p-4 mb-5 shadow-lg">
+      <div className="flex items-center gap-5 bg-white border border-slate-200 rounded-3xl p-5 mb-5 shadow-sm">
         {/* Mini Radial Ring */}
         <div className="relative shrink-0">
           <svg width="86" height="86" viewBox="0 0 120 120" className="transform -rotate-90">
-            <circle cx="60" cy="60" r={radius} stroke="#0f172a" strokeWidth="8" fill="none" />
+            <circle cx="60" cy="60" r={radius} stroke="#e2e8f0" strokeWidth="8" fill="none" />
             <motion.circle
               cx="60" cy="60" r={radius}
               stroke={ringColor} strokeWidth="8" fill="none" strokeLinecap="round"
@@ -155,21 +155,21 @@ const ManifestLog = ({ uid, selectedDate, setSelectedDate, profile }) => {
             />
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-base font-extrabold font-mono text-white leading-none">{totalCalories}</span>
-            <span className="text-[8px] font-mono text-slate-500 mt-0.5">/{calorieTarget}</span>
+            <span className="text-base font-black text-slate-900 leading-none">{totalCalories}</span>
+            <span className="text-[8px] font-bold text-slate-450 mt-0.5">/{calorieTarget}</span>
           </div>
         </div>
 
         {/* Stats */}
         <div className="flex-1 space-y-2.5">
           <div className="flex items-center gap-2">
-            <IoFlame className="text-emerald-400 shrink-0" size={15} />
+            <IoFlame className="text-emerald-600 shrink-0" size={15} />
             <div className="flex-1">
               <div className="flex justify-between items-center leading-none">
-                <span className="text-[8px] font-mono text-slate-500 tracking-wider">CALORIES</span>
-                <span className="text-[10px] font-mono font-bold text-emerald-400">{totalCalories} / {calorieTarget} kcal</span>
+                <span className="text-[8px] font-bold text-slate-400 tracking-wider">CALORIES</span>
+                <span className="text-[10px] font-black text-emerald-605">{totalCalories} / {calorieTarget} kcal</span>
               </div>
-              <div className="h-1.5 bg-slate-950 rounded-full overflow-hidden mt-1.5 border border-slate-850">
+              <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden mt-1.5 border border-slate-200/50">
                 <motion.div className="h-full rounded-full bg-gradient-to-r from-emerald-600 to-emerald-400"
                   initial={{ width: 0 }} animate={{ width: `${caloriePercent}%` }} transition={{ duration: 0.6 }}
                 />
@@ -177,13 +177,13 @@ const ManifestLog = ({ uid, selectedDate, setSelectedDate, profile }) => {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <IoNutrition className="text-cyan-400 shrink-0" size={15} />
+            <IoNutrition className="text-cyan-600 shrink-0" size={15} />
             <div className="flex-1">
               <div className="flex justify-between items-center leading-none">
-                <span className="text-[8px] font-mono text-slate-500 tracking-wider">PROTEIN</span>
-                <span className="text-[10px] font-mono font-bold text-cyan-400">{totalProtein.toFixed(1)}g / {proteinTarget}g</span>
+                <span className="text-[8px] font-bold text-slate-400 tracking-wider">PROTEIN</span>
+                <span className="text-[10px] font-black text-cyan-605">{totalProtein.toFixed(1)}g / {proteinTarget}g</span>
               </div>
-              <div className="h-1.5 bg-slate-950 rounded-full overflow-hidden mt-1.5 border border-slate-850">
+              <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden mt-1.5 border border-slate-200/50">
                 <motion.div className="h-full rounded-full bg-gradient-to-r from-cyan-600 to-cyan-400"
                   initial={{ width: 0 }} animate={{ width: `${Math.min((totalProtein / proteinTarget) * 100, 100)}%` }} transition={{ duration: 0.6 }}
                 />
@@ -191,7 +191,7 @@ const ManifestLog = ({ uid, selectedDate, setSelectedDate, profile }) => {
             </div>
           </div>
           {isOverdrive && (
-            <span className="text-[8px] font-mono font-bold text-fuchsia-400 overdrive-pulse bg-fuchsia-500/10 px-2.5 py-0.5 rounded-full border border-fuchsia-500/20 inline-block mt-1">
+            <span className="text-[8px] font-bold text-fuchsia-700 bg-fuchsia-50 px-2.5 py-0.5 rounded-full border border-fuchsia-200 inline-block mt-1 uppercase">
               ⚡ OVERDRIVE +{totalCalories - calorieTarget} kcal
             </span>
           )}
@@ -200,13 +200,13 @@ const ManifestLog = ({ uid, selectedDate, setSelectedDate, profile }) => {
 
       {/* Go to Today Quick Action */}
       {!isToday(selectedDate) && (
-        <button onClick={() => setSelectedDate(new Date())} className="w-full text-center text-[10px] font-mono font-bold text-cyan-400 hover:text-cyan-300 mb-4 py-1.5 bg-cyan-950/20 border border-cyan-900/20 rounded-xl transition-all tracking-wider">
+        <button onClick={() => setSelectedDate(new Date())} className="w-full text-center text-[10px] font-bold text-cyan-600 hover:text-cyan-750 mb-4 py-2 bg-cyan-50 border border-cyan-200 rounded-2xl transition-all tracking-wider cursor-pointer shadow-sm">
           ↩ RE-SYNCHRONIZE TO TODAY
         </button>
       )}
 
       {/* Food Entries Timeline */}
-      <div className="space-y-1.5 max-h-[45vh] overflow-y-auto scrollbar-thin">
+      <div className="space-y-2 max-h-[45vh] overflow-y-auto scrollbar-thin pr-1">
         <AnimatePresence>
           {foodLogs.map((log, idx) => (
             <motion.div
@@ -216,39 +216,39 @@ const ManifestLog = ({ uid, selectedDate, setSelectedDate, profile }) => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20, height: 0 }}
               transition={{ duration: 0.2 }}
-              className="flex items-center gap-3 bg-slate-900/50 border border-slate-855 hover:border-slate-800 rounded-xl px-4 py-3 min-h-[52px] transition-all hover:shadow-cyan-500/5 shadow-sm"
+              className="flex items-center gap-3 bg-white border border-slate-200 hover:border-slate-250 rounded-2xl px-4 py-3.5 min-h-[52px] transition-all hover:shadow-cyan-500/5 shadow-sm"
             >
               {/* Index Number Badge */}
-              <div className="w-8 h-8 bg-slate-950/60 border border-slate-800/80 rounded-lg flex items-center justify-center shrink-0">
-                <span className="text-[10px] font-mono text-slate-400 font-bold">{idx + 1}</span>
+              <div className="w-8 h-8 bg-slate-100 border border-slate-200 rounded-xl flex items-center justify-center shrink-0">
+                <span className="text-[10px] font-bold text-slate-500">{idx + 1}</span>
               </div>
 
               {/* Details */}
               <div className="flex-1 min-w-0 mr-2">
-                <span className="text-xs font-mono font-medium text-slate-200 block truncate">{log.foodName}</span>
-                <span className="text-[8px] font-mono text-slate-500 block uppercase tracking-wider mt-0.5">CHRONICLE LOG</span>
+                <span className="text-[13px] font-bold text-slate-805 block truncate">{log.foodName}</span>
+                <span className="text-[8px] font-bold text-slate-400 block uppercase tracking-wider mt-0.5">CHRONICLE LOG</span>
               </div>
 
               {/* Stats & Actions */}
               <div className="flex items-center gap-2.5 shrink-0">
                 <div className="text-right">
-                  <span className="text-xs font-extrabold font-mono text-emerald-400 block">{log.calories} <span className="text-[8px] font-mono text-slate-500 font-normal">KCAL</span></span>
+                  <span className="text-xs font-black text-emerald-600 block">{log.calories} <span className="text-[8px] text-slate-400 font-bold uppercase">kcal</span></span>
                 </div>
-                <div className="bg-slate-850/60 border border-slate-800/40 rounded-lg px-2 py-1 min-w-[42px] text-center">
-                  <span className="text-[10px] font-bold font-mono text-slate-300 block leading-none">{log.protein}g</span>
-                  <span className="text-[6px] font-mono text-slate-500 block uppercase mt-0.5 font-bold">PRO</span>
+                <div className="bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 min-w-[42px] text-center shadow-inner">
+                  <span className="text-[10px] font-black text-slate-650 block leading-none">{log.protein}g</span>
+                  <span className="text-[6px] font-bold text-slate-400 block uppercase mt-0.5">PRO</span>
                 </div>
 
                 {/* Delete button */}
                 <button
                   onClick={() => handleDelete(log.id)}
                   disabled={deleting === log.id}
-                  className="w-8 h-8 flex items-center justify-center text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"
+                  className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all cursor-pointer"
                   aria-label="Delete entry"
                 >
                   {deleting === log.id ? (
                     <motion.span animate={{ rotate: 360 }} transition={{ duration: 0.6, repeat: Infinity, ease: 'linear' }}
-                      className="inline-block w-4 h-4 border-2 border-slate-600 border-t-red-400 rounded-full" />
+                      className="inline-block w-4 h-4 border-2 border-slate-200 border-t-red-500 rounded-full" />
                   ) : (
                     <IoTrash size={13} />
                   )}
@@ -259,35 +259,35 @@ const ManifestLog = ({ uid, selectedDate, setSelectedDate, profile }) => {
         </AnimatePresence>
 
         {foodLogs.length === 0 && (
-          <div className="text-center py-12 bg-slate-900/20 border border-slate-900/50 rounded-2xl">
+          <div className="text-center py-12 bg-slate-100/50 border border-slate-200 rounded-3xl shadow-sm">
             <div className="text-3xl mb-2.5">📋</div>
-            <h4 className="text-xs font-mono font-bold text-slate-500 tracking-wider uppercase">NO RECORDS RETRIEVED</h4>
-            <p className="text-[9px] font-mono text-slate-600 uppercase mt-1 tracking-wider">TAP QUEST VAULT TO ADD ENTRIES FOR THIS DAY</p>
+            <h4 className="text-xs font-bold text-slate-450 tracking-wider uppercase">NO RECORDS RETRIEVED</h4>
+            <p className="text-[9px] font-bold text-slate-400 uppercase mt-1 tracking-wider">TAP QUEST VAULT TO ADD ENTRIES FOR THIS DAY</p>
           </div>
         )}
       </div>
 
-      {/* ──────── Custom Cyberpunk Calendar Modal ──────── */}
+      {/* ──────── Custom Calendar Modal ──────── */}
       <AnimatePresence>
         {showCalendar && (
           <>
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowCalendar(false)}
-              className="fixed inset-0 bg-black/80 backdrop-blur-md z-[80]" />
+              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[80]" />
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
-              className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-slate-900 border border-slate-800 rounded-2xl p-5 z-[90] max-w-sm w-full shadow-2xl shadow-cyan-500/5 flex flex-col"
+              className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white border border-slate-200 rounded-3xl p-5 z-[90] max-w-sm w-full shadow-2xl flex flex-col"
             >
               {/* Calendar Header */}
-              <div className="flex items-center justify-between mb-4 border-b border-slate-850 pb-3">
-                <button onClick={prevMonth} className="w-9 h-9 flex items-center justify-center bg-slate-850 hover:bg-slate-800 border border-slate-800/60 rounded-lg text-slate-300 hover:text-cyan-400 active:scale-95 transition-all">
+              <div className="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
+                <button onClick={prevMonth} className="w-9 h-9 flex items-center justify-center bg-slate-100 hover:bg-slate-200 border border-slate-200/60 rounded-lg text-slate-650 hover:text-cyan-600 active:scale-95 transition-all shadow-sm cursor-pointer">
                   <IoChevronBack size={16} />
                 </button>
                 <div className="text-center">
-                  <span className="text-sm font-extrabold font-mono text-white tracking-widest">
+                  <span className="text-sm font-black text-slate-900 tracking-widest uppercase">
                     {MONTHS[calendarMonth.getMonth()]} {calendarMonth.getFullYear()}
                   </span>
                 </div>
-                <button onClick={nextMonth} className="w-9 h-9 flex items-center justify-center bg-slate-850 hover:bg-slate-800 border border-slate-800/60 rounded-lg text-slate-300 hover:text-cyan-400 active:scale-95 transition-all">
+                <button onClick={nextMonth} className="w-9 h-9 flex items-center justify-center bg-slate-100 hover:bg-slate-200 border border-slate-200/60 rounded-lg text-slate-650 hover:text-cyan-600 active:scale-95 transition-all shadow-sm cursor-pointer">
                   <IoChevronForward size={16} />
                 </button>
               </div>
@@ -295,7 +295,7 @@ const ManifestLog = ({ uid, selectedDate, setSelectedDate, profile }) => {
               {/* Day Headers (SU, MO...) */}
               <div className="grid grid-cols-7 gap-1 text-center mb-2">
                 {DAYS_SHORT.map((day) => (
-                  <span key={day} className="text-[8px] font-mono font-bold text-slate-500 tracking-wider">
+                  <span key={day} className="text-[8px] font-bold text-slate-400 tracking-wider uppercase">
                     {day}
                   </span>
                 ))}
@@ -323,12 +323,12 @@ const ManifestLog = ({ uid, selectedDate, setSelectedDate, profile }) => {
                         setSelectedDate(new Date(calendarMonth.getFullYear(), calendarMonth.getMonth(), day));
                         setShowCalendar(false);
                       }}
-                      className={`w-9 h-9 flex items-center justify-center rounded-lg text-xs font-mono transition-all font-semibold ${
+                      className={`w-9 h-9 flex items-center justify-center rounded-lg text-xs transition-all font-bold cursor-pointer ${
                         isSel
-                          ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/50 shadow-sm shadow-cyan-500/20'
+                          ? 'bg-cyan-50 text-cyan-600 border border-cyan-300 shadow-sm shadow-cyan-500/10'
                           : isTod
-                          ? 'bg-slate-800/40 text-slate-200 border border-slate-700/80 hover:bg-slate-800'
-                          : 'bg-transparent text-slate-400 hover:bg-slate-800/50 hover:text-slate-200'
+                          ? 'bg-slate-100 text-slate-700 border border-slate-250 hover:bg-slate-200 font-black shadow-inner'
+                          : 'bg-transparent text-slate-450 hover:bg-slate-50 hover:text-slate-800'
                       }`}
                     >
                       {day}
@@ -339,9 +339,9 @@ const ManifestLog = ({ uid, selectedDate, setSelectedDate, profile }) => {
 
               <button
                 onClick={() => setShowCalendar(false)}
-                className="w-full mt-5 py-2.5 bg-slate-800 hover:bg-slate-750 text-slate-400 hover:text-slate-200 text-xs font-mono font-bold rounded-xl transition-all uppercase tracking-wider min-h-[40px]"
+                className="w-full mt-5 py-2.5 bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-500 hover:text-slate-800 text-xs font-bold rounded-2xl transition-all uppercase tracking-wider min-h-[44px] cursor-pointer shadow-sm"
               >
-                DISMISS SYSTEM
+                DISMISS CALENDAR
               </button>
             </motion.div>
           </>
