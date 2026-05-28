@@ -37,6 +37,7 @@ const isToday = (date) => {
 const ManifestLog = ({ uid, selectedDate, setSelectedDate, profile }) => {
   const [foodLogs, setFoodLogs] = useState([]);
   const [deleting, setDeleting] = useState(null);
+  const [confirmDelete, setConfirmDelete] = useState(null);
   
   // Custom Calendar Modal State
   const [showCalendar, setShowCalendar] = useState(false);
@@ -69,6 +70,7 @@ const ManifestLog = ({ uid, selectedDate, setSelectedDate, profile }) => {
       console.error('Delete error:', e);
     } finally {
       setDeleting(null);
+      setConfirmDelete(null);
     }
   };
 
@@ -239,20 +241,25 @@ const ManifestLog = ({ uid, selectedDate, setSelectedDate, profile }) => {
                   <span className="text-[6px] font-bold text-slate-400 block uppercase mt-0.5">PRO</span>
                 </div>
 
-                {/* Delete button */}
-                <button
-                  onClick={() => handleDelete(log.id)}
-                  disabled={deleting === log.id}
-                  className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all cursor-pointer"
-                  aria-label="Delete entry"
-                >
-                  {deleting === log.id ? (
-                    <motion.span animate={{ rotate: 360 }} transition={{ duration: 0.6, repeat: Infinity, ease: 'linear' }}
-                      className="inline-block w-4 h-4 border-2 border-slate-200 border-t-red-500 rounded-full" />
-                  ) : (
+                {/* Delete confirm / Warning check */}
+                {confirmDelete === log.id ? (
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <button onClick={() => handleDelete(log.id)} disabled={deleting === log.id}
+                      className="text-[9px] font-bold bg-red-50 text-red-600 border border-red-200 px-2 py-1 rounded-lg hover:bg-red-100 transition-colors min-w-[40px] cursor-pointer">
+                      {deleting === log.id ? '...' : 'YES'}
+                    </button>
+                    <button onClick={() => setConfirmDelete(null)}
+                      className="text-[9px] font-bold text-slate-400 hover:text-slate-700 px-1.5 py-1 rounded cursor-pointer">NO</button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setConfirmDelete(log.id)}
+                    className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all cursor-pointer"
+                    aria-label="Delete entry"
+                  >
                     <IoTrash size={13} />
-                  )}
-                </button>
+                  </button>
+                )}
               </div>
             </motion.div>
           ))}

@@ -9,7 +9,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { IoScale, IoTrendingUp, IoFlame, IoCalendar, IoTrophy, IoTrash, IoClose } from 'react-icons/io5';
 import {
-  ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, AreaChart, Area,
+  ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, AreaChart, Area, LabelList,
 } from 'recharts';
 import { subscribeWeightLogs, addWeightLog, deleteWeightLog, subscribeAllFoodLogs } from '../../firebase/firestoreService';
 
@@ -199,7 +199,10 @@ const Archive = ({ uid, profile }) => {
               <Tooltip content={<WeightTooltip />} wrapperStyle={{ pointerEvents: 'none' }} />
               <ReferenceLine y={weightGoal} stroke="#06b6d4" strokeDasharray="6 4" strokeWidth={1} />
               <Line type="monotone" dataKey="weight" stroke="#10b981" strokeWidth={2} dot={{ r: 3.5, fill: '#10b981', stroke: '#ffffff', strokeWidth: 2 }}
-                style={{ filter: 'drop-shadow(0 2px 6px rgba(16,185,129,0.2))' }} />
+                style={{ filter: 'drop-shadow(0 2px 6px rgba(16,185,129,0.2))' }}>
+                <LabelList dataKey="weight" position="top" offset={8} formatter={(v) => `${v}kg`}
+                  style={{ fontSize: 8, fontFamily: 'sans-serif', fontWeight: '800', fill: '#047857' }} />
+              </Line>
             </LineChart>
           </ResponsiveContainer>
         </div>
