@@ -171,8 +171,12 @@ const Dashboard = () => {
     );
   }
 
-  if (!profile || isEditingProfile) {
-    return <ProfileSetup uid={user.uid} onComplete={(data) => { setProfile(data); setIsEditingProfile(false); }} />;
+  if (!profile) {
+    return <ProfileSetup uid={user.uid} onComplete={(data) => setProfile(data)} />;
+  }
+
+  if (isEditingProfile) {
+    return <ProfileSetup uid={user.uid} onComplete={(data) => { setProfile(data); setIsEditingProfile(false); }} onCancel={() => setIsEditingProfile(false)} />;
   }
 
   return (

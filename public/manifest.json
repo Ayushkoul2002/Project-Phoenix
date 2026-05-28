@@ -1,15 +1,15 @@
 {
   "name": "Project Phoenix",
   "short_name": "Phoenix",
-  "description": "Cyberpunk Nutrition & Weight Tracker Dashboard",
+  "description": "Aesthetic Nutrition & Weight Tracker for Gym Freaks",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#020617",
-  "theme_color": "#020617",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/vite.svg",
+      "src": "/favicon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"

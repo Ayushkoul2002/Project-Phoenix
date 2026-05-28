@@ -1,10 +1,25 @@
 // ============================================
-// PROJECT PHOENIX — Cyberpunk Terminal Login
+// PROJECT PHOENIX — Aesthetic Motivation Login
+// ============================================
+// Redesigned login screen featuring a warm athletic
+// gym freak theme, high contrast panels, modern inputs,
+// and randomized motivational workout quotes.
 // ============================================
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { IoMail, IoLockClosed, IoFlame } from 'react-icons/io5';
 import { loginUser, signupUser, resetUserPassword } from '../../firebase/authService';
+
+const MOTIVATIONAL_QUOTES = [
+  "Consistency beats talent. Show up every single day.",
+  "Your only limit is you. Push harder, fuel smarter.",
+  "Crush today's calorie targets. Build tomorrow's strength.",
+  "No shortcuts. Just discipline, consistency, and progress.",
+  "Make today count. Fuel your physical evolution.",
+  "Suffer the pain of discipline, or suffer the pain of regret.",
+  "Your body achieves what your mind believes. Train hard."
+];
 
 const LoginScreen = () => {
   const [isSignup, setIsSignup] = useState(false);
@@ -14,6 +29,9 @@ const LoginScreen = () => {
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Pick a single motivational quote on mount
+  const [quote] = useState(() => MOTIVATIONAL_QUOTES[Math.floor(Math.random() * MOTIVATIONAL_QUOTES.length)]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -31,13 +49,13 @@ const LoginScreen = () => {
       }
     } catch (err) {
       const msg = err.code === 'auth/invalid-credential'
-        ? 'ACCESS DENIED — Invalid credentials'
+        ? 'Invalid email or password'
         : err.code === 'auth/email-already-in-use'
-        ? 'AGENT EXISTS — Email already registered'
+        ? 'This email is already registered'
         : err.code === 'auth/weak-password'
-        ? 'WEAK CIPHER — Password must be 6+ characters'
+        ? 'Password must be at least 6 characters'
         : err.code === 'auth/user-not-found'
-        ? 'NOT FOUND — No registered account found with this email'
+        ? 'No registered account found with this email'
         : `ERROR: ${err.message}`;
       setError(msg);
     } finally {
@@ -46,232 +64,217 @@ const LoginScreen = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Scanline overlay */}
-      <div className="scanline-overlay" />
-      
-      {/* Ambient glow */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-cyan-500/10 rounded-full blur-[120px]" />
+    <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6 relative overflow-hidden font-sans select-none">
+      {/* Background Radial Glow */}
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-cyan-500/5 rounded-full blur-[140px]" />
       
       <motion.div
-        initial={{ opacity: 0, y: 30 }}
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: 'easeOut' }}
+        transition={{ duration: 0.5, ease: 'easeOut' }}
         className="w-full max-w-md relative z-10"
       >
-        {/* Terminal Header */}
-        <div className="text-center mb-8">
-          <motion.h1
-            className="text-4xl font-bold font-mono tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-emerald-400"
-            animate={{ textShadow: ['0 0 20px rgba(6,182,212,0.5)', '0 0 40px rgba(6,182,212,0.8)', '0 0 20px rgba(6,182,212,0.5)'] }}
-            transition={{ duration: 2, repeat: Infinity }}
+        {/* Aesthetic Header */}
+        <div className="text-center mb-8 flex flex-col items-center">
+          <motion.div
+            animate={{ scale: [1, 1.05, 1] }}
+            transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+            className="w-13 h-13 rounded-full bg-gradient-to-br from-cyan-400 to-emerald-400 flex items-center justify-center shadow-lg shadow-cyan-500/20 mb-3"
           >
+            <IoFlame size={26} className="text-white" />
+          </motion.div>
+          <h1 className="text-3xl font-black tracking-widest text-white uppercase">
             PHOENIX
-          </motion.h1>
-          <p className="text-slate-500 text-xs font-mono mt-2 tracking-[0.3em]">
-            SECURE TERMINAL v2.0
+          </h1>
+          <p className="text-slate-400 text-[10px] font-bold mt-1 tracking-[0.25em] uppercase">
+            CRUSH TARGETS • CRUSH GOALS
           </p>
         </div>
 
-        {/* Terminal Card */}
-        <div className="bg-slate-900/80 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-6 shadow-2xl shadow-cyan-500/5">
-          {/* Mode Toggle */}
-          <div className="flex mb-6 bg-slate-800/50 rounded-xl p-1 border border-slate-700/30">
+        {/* Form Card */}
+        <div className="bg-slate-850 border border-slate-750 rounded-3xl p-6 shadow-2xl">
+          {/* Mode Switch Tab Bar */}
+          <div className="flex mb-6 bg-slate-900 rounded-2xl p-1 border border-slate-800">
             <button
               type="button"
-              onClick={() => { setIsSignup(false); setError(''); }}
-              className={`flex-1 py-2.5 rounded-lg text-sm font-mono font-semibold transition-all duration-300 ${
-                !isSignup
-                  ? 'bg-cyan-500/20 text-cyan-400 shadow-lg shadow-cyan-500/10 border border-cyan-500/30'
-                  : 'text-slate-500 hover:text-slate-400'
+              onClick={() => { setIsSignup(false); setIsForgot(false); setError(''); setSuccessMsg(''); }}
+              className={`flex-1 py-3 rounded-xl text-xs font-extrabold tracking-wider transition-all ${
+                !isSignup && !isForgot
+                  ? 'bg-cyan-500/20 text-cyan-300 shadow shadow-cyan-500/10 border border-cyan-400/20'
+                  : 'text-slate-500 hover:text-slate-350'
               }`}
             >
-              ACCESS TERMINAL
+              SIGN IN
             </button>
             <button
               type="button"
-              onClick={() => { setIsSignup(true); setError(''); }}
-              className={`flex-1 py-2.5 rounded-lg text-sm font-mono font-semibold transition-all duration-300 ${
+              onClick={() => { setIsSignup(true); setIsForgot(false); setError(''); setSuccessMsg(''); }}
+              className={`flex-1 py-3 rounded-xl text-xs font-extrabold tracking-wider transition-all ${
                 isSignup
-                  ? 'bg-emerald-500/20 text-emerald-400 shadow-lg shadow-emerald-500/10 border border-emerald-500/30'
-                  : 'text-slate-500 hover:text-slate-400'
+                  ? 'bg-emerald-500/20 text-emerald-300 shadow shadow-emerald-500/10 border border-emerald-400/20'
+                  : 'text-slate-500 hover:text-slate-350'
               }`}
             >
-              CREATE AGENT
+              REGISTER
             </button>
           </div>
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Input Fields */}
+          <form onSubmit={handleSubmit} className="space-y-5">
             <AnimatePresence mode="wait">
               {isForgot ? (
                 <motion.div
                   key="forgot"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
-                  transition={{ duration: 0.25 }}
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -5 }}
+                  transition={{ duration: 0.15 }}
                   className="space-y-4"
                 >
-                  <div>
-                    <label className="block text-xs font-mono text-slate-500 mb-1.5 tracking-wider">
-                      AGENT_ID (EMAIL)
+                  <div className="space-y-1.5">
+                    <label className="block text-[10px] font-bold text-slate-400 tracking-wider uppercase">
+                      Your Email Address
                     </label>
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      className="w-full bg-slate-800/60 border border-slate-600/50 rounded-xl px-4 py-3 text-slate-200 font-mono text-sm placeholder-slate-600 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/30 transition-all"
-                      placeholder="Enter registered email..."
-                    />
+                    <div className="relative flex items-center bg-slate-900 border border-slate-750 rounded-xl px-3.5 py-3.5 focus-within:border-cyan-400 transition-all shadow-inner">
+                      <IoMail className="text-slate-500 mr-2.5 shrink-0" size={16} />
+                      <input
+                        type="email" value={email} onChange={(e) => setEmail(e.target.value)} required
+                        className="flex-1 bg-transparent text-slate-100 text-sm focus:outline-none placeholder-slate-650"
+                        placeholder="Enter registered email..."
+                      />
+                    </div>
                   </div>
                 </motion.div>
               ) : (
                 <motion.div
                   key={isSignup ? 'signup' : 'login'}
-                  initial={{ opacity: 0, x: isSignup ? 20 : -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: isSignup ? -20 : 20 }}
-                  transition={{ duration: 0.25 }}
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -5 }}
+                  transition={{ duration: 0.15 }}
                   className="space-y-4"
                 >
-                  <div>
-                    <label className="block text-xs font-mono text-slate-500 mb-1.5 tracking-wider">
-                      AGENT_ID (EMAIL)
+                  <div className="space-y-1.5">
+                    <label className="block text-[10px] font-bold text-slate-400 tracking-wider uppercase">
+                      Email Address
                     </label>
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      className="w-full bg-slate-800/60 border border-slate-600/50 rounded-xl px-4 py-3 text-slate-200 font-mono text-sm placeholder-slate-600 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/30 transition-all"
-                      placeholder="agent@phoenix.sys"
-                    />
+                    <div className="relative flex items-center bg-slate-900 border border-slate-750 rounded-xl px-3.5 py-3.5 focus-within:border-cyan-400 transition-all shadow-inner">
+                      <IoMail className="text-slate-500 mr-2.5 shrink-0" size={16} />
+                      <input
+                        type="email" value={email} onChange={(e) => setEmail(e.target.value)} required
+                        className="flex-1 bg-transparent text-slate-100 text-sm focus:outline-none placeholder-slate-650"
+                        placeholder="Enter your email..."
+                      />
+                    </div>
                   </div>
-                  <div>
-                    <label className="block text-xs font-mono text-slate-500 mb-1.5 tracking-wider">
-                      CIPHER_KEY (PASSWORD)
+                  <div className="space-y-1.5">
+                    <label className="block text-[10px] font-bold text-slate-400 tracking-wider uppercase">
+                      Password
                     </label>
-                    <input
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                      className="w-full bg-slate-800/60 border border-slate-600/50 rounded-xl px-4 py-3 text-slate-200 font-mono text-sm placeholder-slate-600 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/30 transition-all"
-                      placeholder="••••••••••••"
-                    />
+                    <div className="relative flex items-center bg-slate-900 border border-slate-750 rounded-xl px-3.5 py-3.5 focus-within:border-cyan-400 transition-all shadow-inner">
+                      <IoLockClosed className="text-slate-500 mr-2.5 shrink-0" size={16} />
+                      <input
+                        type="password" value={password} onChange={(e) => setPassword(e.target.value)} required
+                        className="flex-1 bg-transparent text-slate-100 text-sm focus:outline-none placeholder-slate-650"
+                        placeholder="••••••••••••"
+                      />
+                    </div>
                   </div>
                 </motion.div>
               )}
             </AnimatePresence>
 
-            {/* Error */}
+            {/* Notifications */}
             <AnimatePresence>
               {error && (
                 <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="bg-amber-500/10 border border-amber-500/30 rounded-xl px-4 py-2.5 text-amber-400 text-xs font-mono"
+                  initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
+                  className="bg-amber-500/10 border border-amber-500/20 rounded-xl px-4 py-3 text-amber-400 text-xs font-semibold leading-relaxed"
                 >
                   ⚠ {error}
                 </motion.div>
               )}
-            </AnimatePresence>
-
-            {/* Success */}
-            <AnimatePresence>
               {successMsg && (
                 <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl px-4 py-2.5 text-emerald-400 text-xs font-mono leading-relaxed"
+                  initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
+                  className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl px-4 py-3 text-emerald-400 text-xs font-semibold leading-relaxed"
                 >
                   ✓ {successMsg}
                 </motion.div>
               )}
             </AnimatePresence>
 
-            {/* Submit */}
+            {/* Action Submit Button */}
             <motion.button
-              type="submit"
-              disabled={loading}
-              whileTap={{ scale: 0.97 }}
-              className={`w-full py-3.5 rounded-xl font-mono font-bold text-sm tracking-wider transition-all duration-300 ${
+              type="submit" disabled={loading} whileTap={{ scale: 0.97 }}
+              className={`w-full py-4 rounded-xl text-xs font-extrabold tracking-widest transition-all ${
                 isForgot
-                  ? 'bg-gradient-to-r from-cyan-600 to-cyan-500 text-white shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40'
+                  ? 'bg-gradient-to-r from-cyan-600 to-cyan-500 text-white shadow shadow-cyan-500/10'
                   : isSignup
-                  ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 text-white shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40'
-                  : 'bg-gradient-to-r from-cyan-600 to-cyan-500 text-white shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40'
-              } disabled:opacity-50 disabled:cursor-not-allowed`}
+                  ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 text-white shadow shadow-emerald-500/15'
+                  : 'bg-gradient-to-r from-cyan-600 to-cyan-500 text-white shadow shadow-cyan-500/15'
+              } disabled:opacity-50 min-h-[48px] uppercase`}
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
                   <motion.span
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                    animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
                     className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
                   />
                   PROCESSING...
                 </span>
               ) : isForgot ? (
-                'SEND RESET LINK →'
+                'SEND RESET LINK'
               ) : isSignup ? (
-                'CREATE AGENT →'
+                'START EVOLUTION'
               ) : (
-                'ACCESS TERMINAL →'
+                'SIGN IN'
               )}
             </motion.button>
           </form>
 
-          {/* Footer */}
-          <div className="mt-6 pt-4 border-t border-slate-700/30 text-center">
+          {/* Toggle Footers */}
+          <div className="mt-6 pt-4 border-t border-slate-750 text-center">
             {isForgot ? (
-              <p className="text-slate-600 text-xs font-mono">
-                REMEMBERED PASSWORD?{' '}
+              <p className="text-slate-400 text-xs font-medium">
+                REMEMBERED CIPHER?{' '}
                 <button
                   type="button"
                   onClick={() => { setIsForgot(false); setError(''); setSuccessMsg(''); }}
-                  className="text-cyan-500 hover:text-cyan-400 transition-colors font-bold"
+                  className="text-cyan-400 hover:text-cyan-300 font-bold ml-1 transition-colors"
                 >
-                  ACCESS TERMINAL
+                  SIGN IN
                 </button>
               </p>
             ) : (
-              <div className="space-y-3">
-                <p className="text-slate-600 text-xs font-mono">
-                  {isSignup ? 'EXISTING AGENT?' : 'NEW RECRUIT?'}{' '}
+              <div className="space-y-3.5">
+                <p className="text-slate-400 text-xs font-medium">
+                  {isSignup ? 'ALREADY REGISTERED?' : 'NEW ATHLETE?'}{' '}
                   <button
                     type="button"
                     onClick={() => { setIsSignup(!isSignup); setError(''); setSuccessMsg(''); }}
-                    className="text-cyan-500 hover:text-cyan-400 transition-colors font-bold"
+                    className="text-cyan-400 hover:text-cyan-300 font-bold ml-1 transition-colors"
                   >
-                    {isSignup ? 'ACCESS TERMINAL' : 'CREATE AGENT'}
+                    {isSignup ? 'SIGN IN' : 'REGISTER'}
                   </button>
                 </p>
                 {!isSignup && (
                   <button
                     type="button"
                     onClick={() => { setIsForgot(true); setError(''); setSuccessMsg(''); }}
-                    className="text-[11px] font-mono text-slate-500 hover:text-cyan-400 transition-colors block mx-auto underline tracking-wider"
+                    className="text-[11px] font-bold text-slate-500 hover:text-cyan-400 transition-colors block mx-auto underline tracking-wider uppercase"
                   >
                     FORGOT PASSWORD?
                   </button>
                 )}
               </div>
             )}
-          </div>
-        </div>
 
-        {/* Status bar */}
-        <div className="mt-4 flex justify-between items-center px-2">
-          <span className="text-[10px] font-mono text-slate-600">SYS.STATUS: ONLINE</span>
-          <span className="flex items-center gap-1.5 text-[10px] font-mono text-emerald-500">
-            <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
-            SECURE
-          </span>
+            {/* Warm Motivational Quote Centerpiece */}
+            <div className="mt-6 text-center italic text-xs text-slate-400 max-w-xs mx-auto border-t border-slate-800/40 pt-4 leading-relaxed font-semibold">
+              "{quote}"
+            </div>
+          </div>
         </div>
       </motion.div>
     </div>

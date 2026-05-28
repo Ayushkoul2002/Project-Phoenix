@@ -5,7 +5,7 @@
 // stats, today's snapshot, and visual progress.
 // ============================================
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { IoTrophy, IoFlame, IoFitness, IoStatsChart } from 'react-icons/io5';
 import { subscribeDateFoodLogs, subscribeAllFoodLogs, subscribeWeightLogs } from '../../firebase/firestoreService';
@@ -30,8 +30,15 @@ const MissionControl = ({ uid, selectedDate, profile }) => {
   const proteinTarget = profile?.proteinTarget || 100;
   const weightStart = profile?.currentWeight || 41.0;
   const weightGoal = profile?.targetWeight || 49.0;
-  const deadlineDate = profile?.deadline ? new Date(profile.deadline) : new Date('2026-10-28T00:00:00');
-  const challengeStart = profile?.updatedAt?.toDate ? profile.updatedAt.toDate() : (profile?.updatedAt ? new Date(profile.updatedAt) : new Date('2026-05-28'));
+
+  // Memoize date parsing to prevent infinite render loops!
+  const deadlineStr = profile?.deadline || '2026-10-28T00:00:00';
+  const deadlineDate = useMemo(() => new Date(deadlineStr), [deadlineStr]);
+
+  const challengeStartStr = profile?.updatedAt?.toDate 
+    ? profile.updatedAt.toDate().toISOString() 
+    : (profile?.updatedAt ? new Date(profile.updatedAt).toISOString() : '2026-05-28T00:00:00');
+  const challengeStart = useMemo(() => new Date(challengeStartStr), [challengeStartStr]);
 
   useEffect(() => { const u = subscribeDateFoodLogs(uid, selectedDate || new Date(), setTodayLogs); return () => u(); }, [uid, selectedDate]);
   useEffect(() => { const u = subscribeAllFoodLogs(uid, setAllFoodLogs); return () => u(); }, [uid]);
