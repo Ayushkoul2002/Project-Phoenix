@@ -1,0 +1,354 @@
+// ============================================
+// PROJECT PHOENIX — TAB 3: THE MANIFEST LOG
+// ============================================
+// Day log with date navigation, custom styled 
+// calendar modal, radial progress summary, and 
+// compact chronological food records.
+// ============================================
+
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { IoTrash, IoFlame, IoNutrition, IoChevronBack, IoChevronForward, IoCalendar } from 'react-icons/io5';
+import { subscribeDateFoodLogs, deleteFoodLog } from '../../firebase/firestoreService';
+
+const CALORIE_TARGET = 2436;
+const PROTEIN_TARGET = 100;
+
+const MONTHS = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
+const DAYS_SHORT = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"];
+
+const formatDateLabel = (date) => {
+  const today = new Date();
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+
+  const isSameDay = (a, b) =>
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate();
+
+  if (isSameDay(date, today)) return 'TODAY';
+  if (isSameDay(date, yesterday)) return 'YESTERDAY';
+  return date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
+};
+
+const isToday = (date) => {
+  const now = new Date();
+  return date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth() && date.getDate() === now.getDate();
+};
+
+const ManifestLog = ({ uid, selectedDate, setSelectedDate }) => {
+  const [foodLogs, setFoodLogs] = useState([]);
+  const [deleting, setDeleting] = useState(null);
+  
+  // Custom Calendar Modal State
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [calendarMonth, setCalendarMonth] = useState(new Date());
+
+  useEffect(() => {
+    const unsub = subscribeDateFoodLogs(uid, selectedDate, setFoodLogs);
+    return () => unsub();
+  }, [uid, selectedDate]);
+
+  const totalCalories = foodLogs.reduce((sum, l) => sum + (l.calories || 0), 0);
+  const totalProtein = foodLogs.reduce((sum, l) => sum + (l.protein || 0), 0);
+  const caloriePercent = Math.min((totalCalories / CALORIE_TARGET) * 100, 100);
+  const isOverdrive = totalCalories > CALORIE_TARGET;
+
+  const radius = 50;
+  const circumference = 2 * Math.PI * radius;
+  const strokeDashoffset = circumference - (caloriePercent / 100) * circumference;
+  const ringColor = isOverdrive ? '#d946ef' : '#10b981';
+  const ringGlow = isOverdrive ? '0 0 20px rgba(217,70,239,0.5)' : '0 0 14px rgba(16,185,129,0.4)';
+
+  const handleDelete = async (docId) => {
+    setDeleting(docId);
+    try {
+      await deleteFoodLog(uid, docId);
+    } catch (e) {
+      console.error('Delete error:', e);
+    } finally {
+      setDeleting(null);
+    }
+  };
+
+  const goToPrevDay = () => {
+    const d = new Date(selectedDate);
+    d.setDate(d.getDate() - 1);
+    setSelectedDate(d);
+  };
+
+  const goToNextDay = () => {
+    const d = new Date(selectedDate);
+    d.setDate(d.getDate() + 1);
+    setSelectedDate(d);
+  };
+
+  const toggleCalendar = () => {
+    setCalendarMonth(new Date(selectedDate));
+    setShowCalendar(!showCalendar);
+  };
+
+  // Custom Calendar Date Switching
+  const prevMonth = () => {
+    const d = new Date(calendarMonth);
+    d.setMonth(d.getMonth() - 1);
+    setCalendarMonth(d);
+  };
+
+  const nextMonth = () => {
+    const d = new Date(calendarMonth);
+    d.setMonth(d.getMonth() + 1);
+    setCalendarMonth(d);
+  };
+
+  // Custom Calendar Days Generator
+  const year = calendarMonth.getFullYear();
+  const month = calendarMonth.getMonth();
+  const firstDayIndex = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const blanks = Array(firstDayIndex).fill(null);
+  const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+  const gridItems = [...blanks, ...days];
+
+  return (
+    <div className="px-6 pt-5 pb-8 max-w-lg mx-auto">
+      {/* Header */}
+      <div className="mb-4">
+        <h2 className="text-xl font-extrabold font-mono tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-emerald-400">
+          MANIFEST LOG
+        </h2>
+        <div className="flex items-center gap-2 mt-2">
+          <span className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse" />
+          <span className="text-[9px] font-mono text-slate-500 tracking-wider uppercase">HISTORICAL CHRONICLES INDEX</span>
+        </div>
+      </div>
+
+      {/* Date Navigation */}
+      <div className="flex items-center justify-between bg-slate-900/60 border border-slate-800/80 rounded-2xl px-2 py-1.5 mb-5 shadow-lg">
+        <button onClick={goToPrevDay} className="w-11 h-11 flex items-center justify-center text-slate-400 hover:text-cyan-400 active:scale-90 transition-all rounded-xl hover:bg-slate-800/40" aria-label="Previous day">
+          <IoChevronBack size={18} />
+        </button>
+        <button onClick={toggleCalendar} className="flex items-center gap-2 px-4 py-2 text-xs font-mono font-bold text-slate-200 hover:text-cyan-400 bg-slate-950/60 border border-slate-850 hover:border-cyan-500/30 rounded-xl transition-all min-h-[44px] shadow-inner tracking-wider">
+          <IoCalendar size={14} className="text-cyan-400" />
+          <span>{formatDateLabel(selectedDate)}</span>
+        </button>
+        <button onClick={goToNextDay} className="w-11 h-11 flex items-center justify-center text-slate-400 hover:text-cyan-400 active:scale-90 transition-all rounded-xl hover:bg-slate-800/40" aria-label="Next day">
+          <IoChevronForward size={18} />
+        </button>
+      </div>
+
+      {/* Mini Ring + Summary */}
+      <div className="flex items-center gap-4 bg-slate-900/60 border border-slate-800/85 rounded-2xl p-4 mb-5 shadow-lg">
+        {/* Mini Radial Ring */}
+        <div className="relative shrink-0">
+          <svg width="86" height="86" viewBox="0 0 120 120" className="transform -rotate-90">
+            <circle cx="60" cy="60" r={radius} stroke="#0f172a" strokeWidth="8" fill="none" />
+            <motion.circle
+              cx="60" cy="60" r={radius}
+              stroke={ringColor} strokeWidth="8" fill="none" strokeLinecap="round"
+              strokeDasharray={circumference}
+              initial={{ strokeDashoffset: circumference }}
+              animate={{ strokeDashoffset }}
+              transition={{ duration: 0.8, ease: 'easeOut' }}
+              style={{ filter: `drop-shadow(${ringGlow})` }}
+            />
+          </svg>
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <span className="text-base font-extrabold font-mono text-white leading-none">{totalCalories}</span>
+            <span className="text-[8px] font-mono text-slate-500 mt-0.5">/{CALORIE_TARGET}</span>
+          </div>
+        </div>
+
+        {/* Stats */}
+        <div className="flex-1 space-y-2.5">
+          <div className="flex items-center gap-2">
+            <IoFlame className="text-emerald-400 shrink-0" size={15} />
+            <div className="flex-1">
+              <div className="flex justify-between items-center leading-none">
+                <span className="text-[8px] font-mono text-slate-500 tracking-wider">CALORIES</span>
+                <span className="text-[10px] font-mono font-bold text-emerald-400">{totalCalories} / {CALORIE_TARGET} kcal</span>
+              </div>
+              <div className="h-1.5 bg-slate-950 rounded-full overflow-hidden mt-1.5 border border-slate-850">
+                <motion.div className="h-full rounded-full bg-gradient-to-r from-emerald-600 to-emerald-400"
+                  initial={{ width: 0 }} animate={{ width: `${caloriePercent}%` }} transition={{ duration: 0.6 }}
+                />
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <IoNutrition className="text-cyan-400 shrink-0" size={15} />
+            <div className="flex-1">
+              <div className="flex justify-between items-center leading-none">
+                <span className="text-[8px] font-mono text-slate-500 tracking-wider">PROTEIN</span>
+                <span className="text-[10px] font-mono font-bold text-cyan-400">{totalProtein.toFixed(1)}g / {PROTEIN_TARGET}g</span>
+              </div>
+              <div className="h-1.5 bg-slate-950 rounded-full overflow-hidden mt-1.5 border border-slate-850">
+                <motion.div className="h-full rounded-full bg-gradient-to-r from-cyan-600 to-cyan-400"
+                  initial={{ width: 0 }} animate={{ width: `${Math.min((totalProtein / PROTEIN_TARGET) * 100, 100)}%` }} transition={{ duration: 0.6 }}
+                />
+              </div>
+            </div>
+          </div>
+          {isOverdrive && (
+            <span className="text-[8px] font-mono font-bold text-fuchsia-400 overdrive-pulse bg-fuchsia-500/10 px-2.5 py-0.5 rounded-full border border-fuchsia-500/20 inline-block mt-1">
+              ⚡ OVERDRIVE +{totalCalories - CALORIE_TARGET} kcal
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Go to Today Quick Action */}
+      {!isToday(selectedDate) && (
+        <button onClick={() => setSelectedDate(new Date())} className="w-full text-center text-[10px] font-mono font-bold text-cyan-400 hover:text-cyan-300 mb-4 py-1.5 bg-cyan-950/20 border border-cyan-900/20 rounded-xl transition-all tracking-wider">
+          ↩ RE-SYNCHRONIZE TO TODAY
+        </button>
+      )}
+
+      {/* Food Entries Timeline */}
+      <div className="space-y-1.5 max-h-[45vh] overflow-y-auto scrollbar-thin">
+        <AnimatePresence>
+          {foodLogs.map((log, idx) => (
+            <motion.div
+              key={log.id}
+              layout
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20, height: 0 }}
+              transition={{ duration: 0.2 }}
+              className="flex items-center gap-3 bg-slate-900/50 border border-slate-855 hover:border-slate-800 rounded-xl px-4 py-3 min-h-[52px] transition-all hover:shadow-cyan-500/5 shadow-sm"
+            >
+              {/* Index Number Badge */}
+              <div className="w-8 h-8 bg-slate-950/60 border border-slate-800/80 rounded-lg flex items-center justify-center shrink-0">
+                <span className="text-[10px] font-mono text-slate-400 font-bold">{idx + 1}</span>
+              </div>
+
+              {/* Details */}
+              <div className="flex-1 min-w-0 mr-2">
+                <span className="text-xs font-mono font-medium text-slate-200 block truncate">{log.foodName}</span>
+                <span className="text-[8px] font-mono text-slate-500 block uppercase tracking-wider mt-0.5">CHRONICLE LOG</span>
+              </div>
+
+              {/* Stats & Actions */}
+              <div className="flex items-center gap-2.5 shrink-0">
+                <div className="text-right">
+                  <span className="text-xs font-extrabold font-mono text-emerald-400 block">{log.calories} <span className="text-[8px] font-mono text-slate-500 font-normal">KCAL</span></span>
+                </div>
+                <div className="bg-slate-850/60 border border-slate-800/40 rounded-lg px-2 py-1 min-w-[42px] text-center">
+                  <span className="text-[10px] font-bold font-mono text-slate-300 block leading-none">{log.protein}g</span>
+                  <span className="text-[6px] font-mono text-slate-500 block uppercase mt-0.5 font-bold">PRO</span>
+                </div>
+
+                {/* Delete button */}
+                <button
+                  onClick={() => handleDelete(log.id)}
+                  disabled={deleting === log.id}
+                  className="w-8 h-8 flex items-center justify-center text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"
+                  aria-label="Delete entry"
+                >
+                  {deleting === log.id ? (
+                    <motion.span animate={{ rotate: 360 }} transition={{ duration: 0.6, repeat: Infinity, ease: 'linear' }}
+                      className="inline-block w-4 h-4 border-2 border-slate-600 border-t-red-400 rounded-full" />
+                  ) : (
+                    <IoTrash size={13} />
+                  )}
+                </button>
+              </div>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+
+        {foodLogs.length === 0 && (
+          <div className="text-center py-12 bg-slate-900/20 border border-slate-900/50 rounded-2xl">
+            <div className="text-3xl mb-2.5">📋</div>
+            <h4 className="text-xs font-mono font-bold text-slate-500 tracking-wider uppercase">NO RECORDS RETRIEVED</h4>
+            <p className="text-[9px] font-mono text-slate-600 uppercase mt-1 tracking-wider">TAP QUEST VAULT TO ADD ENTRIES FOR THIS DAY</p>
+          </div>
+        )}
+      </div>
+
+      {/* ──────── Custom Cyberpunk Calendar Modal ──────── */}
+      <AnimatePresence>
+        {showCalendar && (
+          <>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowCalendar(false)}
+              className="fixed inset-0 bg-black/80 backdrop-blur-md z-[80]" />
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
+              className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-slate-900 border border-slate-800 rounded-2xl p-5 z-[90] max-w-sm w-full shadow-2xl shadow-cyan-500/5 flex flex-col"
+            >
+              {/* Calendar Header */}
+              <div className="flex items-center justify-between mb-4 border-b border-slate-850 pb-3">
+                <button onClick={prevMonth} className="w-9 h-9 flex items-center justify-center bg-slate-850 hover:bg-slate-800 border border-slate-800/60 rounded-lg text-slate-300 hover:text-cyan-400 active:scale-95 transition-all">
+                  <IoChevronBack size={16} />
+                </button>
+                <div className="text-center">
+                  <span className="text-sm font-extrabold font-mono text-white tracking-widest">
+                    {MONTHS[calendarMonth.getMonth()]} {calendarMonth.getFullYear()}
+                  </span>
+                </div>
+                <button onClick={nextMonth} className="w-9 h-9 flex items-center justify-center bg-slate-850 hover:bg-slate-800 border border-slate-800/60 rounded-lg text-slate-300 hover:text-cyan-400 active:scale-95 transition-all">
+                  <IoChevronForward size={16} />
+                </button>
+              </div>
+
+              {/* Day Headers (SU, MO...) */}
+              <div className="grid grid-cols-7 gap-1 text-center mb-2">
+                {DAYS_SHORT.map((day) => (
+                  <span key={day} className="text-[8px] font-mono font-bold text-slate-500 tracking-wider">
+                    {day}
+                  </span>
+                ))}
+              </div>
+
+              {/* Days Grid */}
+              <div className="grid grid-cols-7 gap-1">
+                {gridItems.map((day, idx) => {
+                  if (day === null) return <div key={`blank-${idx}`} className="w-9 h-9" />;
+
+                  const isSel = selectedDate.getDate() === day &&
+                    selectedDate.getMonth() === calendarMonth.getMonth() &&
+                    selectedDate.getFullYear() === calendarMonth.getFullYear();
+
+                  const isTod = new Date().getDate() === day &&
+                    new Date().getMonth() === calendarMonth.getMonth() &&
+                    new Date().getFullYear() === calendarMonth.getFullYear();
+
+                  return (
+                    <motion.button
+                      key={`day-${day}`}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => {
+                        setSelectedDate(new Date(calendarMonth.getFullYear(), calendarMonth.getMonth(), day));
+                        setShowCalendar(false);
+                      }}
+                      className={`w-9 h-9 flex items-center justify-center rounded-lg text-xs font-mono transition-all font-semibold ${
+                        isSel
+                          ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/50 shadow-sm shadow-cyan-500/20'
+                          : isTod
+                          ? 'bg-slate-800/40 text-slate-200 border border-slate-700/80 hover:bg-slate-800'
+                          : 'bg-transparent text-slate-400 hover:bg-slate-800/50 hover:text-slate-200'
+                      }`}
+                    >
+                      {day}
+                    </motion.button>
+                  );
+                })}
+              </div>
+
+              <button
+                onClick={() => setShowCalendar(false)}
+                className="w-full mt-5 py-2.5 bg-slate-800 hover:bg-slate-750 text-slate-400 hover:text-slate-200 text-xs font-mono font-bold rounded-xl transition-all uppercase tracking-wider min-h-[40px]"
+              >
+                DISMISS SYSTEM
+              </button>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
+export default ManifestLog;
