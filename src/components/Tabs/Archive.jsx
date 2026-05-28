@@ -203,7 +203,6 @@ const Archive = ({ uid, profile }) => {
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
               <XAxis dataKey="date" tick={{ fontSize: 8, fontFamily: 'sans-serif', fontWeight: '600', fill: '#94a3b8' }} axisLine={{ stroke: '#cbd5e1' }} tickLine={false} />
               <YAxis tick={{ fontSize: 8, fontFamily: 'sans-serif', fontWeight: '600', fill: '#94a3b8' }} axisLine={{ stroke: '#cbd5e1' }} tickLine={false} domain={['dataMin - 3', 'dataMax + 3']} />
-              <Tooltip content={<WeightTooltip />} wrapperStyle={{ pointerEvents: 'none' }} />
               <ReferenceLine y={weightGoal} stroke="#06b6d4" strokeDasharray="6 4" strokeWidth={1} />
               <Line type="monotone" dataKey="weight" stroke="#10b981" strokeWidth={2} dot={{ r: 3.5, fill: '#10b981', stroke: '#ffffff', strokeWidth: 2 }}
                 style={{ filter: 'drop-shadow(0 2px 6px rgba(16,185,129,0.2))' }}>
@@ -231,7 +230,6 @@ const Archive = ({ uid, profile }) => {
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
               <XAxis dataKey="date" tick={{ fontSize: 8, fontFamily: 'sans-serif', fontWeight: '600', fill: '#94a3b8' }} axisLine={{ stroke: '#cbd5e1' }} tickLine={false} />
               <YAxis tick={{ fontSize: 8, fontFamily: 'sans-serif', fontWeight: '600', fill: '#94a3b8' }} axisLine={{ stroke: '#cbd5e1' }} tickLine={false} />
-              <Tooltip content={<CalTooltip />} wrapperStyle={{ pointerEvents: 'none' }} />
               <ReferenceLine y={calorieTarget} stroke="#f59e0b" strokeDasharray="6 4" strokeWidth={1} />
               <defs><linearGradient id="calG" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#f59e0b" stopOpacity={0.2} /><stop offset="95%" stopColor="#f59e0b" stopOpacity={0.01} /></linearGradient></defs>
               <Area type="monotone" dataKey="calories" stroke="#f59e0b" strokeWidth={1.5} fill="url(#calG)" />
