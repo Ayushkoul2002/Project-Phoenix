@@ -10,11 +10,11 @@ import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   IoShieldCheckmark, IoBook, IoList, IoStatsChart, IoLogOut, 
-  IoAdd, IoClose, IoSearch, IoFlash 
+  IoAdd, IoClose, IoSearch, IoFlash, IoSettings, IoScale, IoSpeedometer, IoRefresh 
 } from 'react-icons/io5';
 import { useAuth } from '../../context/AuthContext';
 import { logoutUser } from '../../firebase/authService';
-import { subscribeCustomFoods, subscribeAllFoodLogs, addFoodLog, subscribeUserProfile } from '../../firebase/firestoreService';
+import { subscribeCustomFoods, subscribeAllFoodLogs, addFoodLog, subscribeUserProfile, wipeAllUserData } from '../../firebase/firestoreService';
 import defaultFoods from '../../data/defaultFoods';
 import MissionControl from '../Tabs/MissionControl';
 import QuestVault from '../Tabs/QuestVault';
@@ -54,6 +54,9 @@ const Dashboard = () => {
 
   const [profile, setProfile] = useState(null);
   const [profileLoading, setProfileLoading] = useState(true);
+  const [showSettings, setShowSettings] = useState(false);
+  const [showWipeConfirm, setShowWipeConfirm] = useState(false);
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
 
   // Subscribe to user profile
   useEffect(() => {
@@ -168,8 +171,8 @@ const Dashboard = () => {
     );
   }
 
-  if (!profile) {
-    return <ProfileSetup uid={user.uid} onComplete={(data) => setProfile(data)} />;
+  if (!profile || isEditingProfile) {
+    return <ProfileSetup uid={user.uid} onComplete={(data) => { setProfile(data); setIsEditingProfile(false); }} />;
   }
 
   return (
@@ -181,12 +184,12 @@ const Dashboard = () => {
           <span className="text-[10px] font-mono text-slate-500 tracking-wider">PHOENIX_OS</span>
         </div>
         <button
-          onClick={handleLogout}
-          className="flex items-center gap-1.5 text-[10px] font-mono text-slate-500 hover:text-amber-400 transition-colors p-2 min-w-[44px] min-h-[44px] justify-center"
-          aria-label="Logout"
+          onClick={() => setShowSettings(true)}
+          className="flex items-center gap-1.5 text-[10px] font-mono text-slate-400 hover:text-cyan-400 transition-colors p-2 min-w-[44px] min-h-[44px] justify-center"
+          aria-label="Open Settings"
         >
-          <IoLogOut size={15} />
-          <span className="hidden sm:inline">EXIT</span>
+          <IoSettings size={16} />
+          <span className="hidden sm:inline font-bold tracking-wider">SETTINGS</span>
         </button>
       </header>
 
@@ -382,6 +385,131 @@ const Dashboard = () => {
                   {fabFilteredFoods.length === 0 && <p className="text-center text-[10px] font-mono text-slate-600 py-4">NO RESULTS</p>}
                 </div>
               )}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* ──────── Settings Overlay Panel ──────── */}
+      <AnimatePresence>
+        {showSettings && (
+          <>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowSettings(false)}
+              className="fixed inset-0 bg-black/80 backdrop-blur-md z-[80]" />
+            <motion.div
+              initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 28, stiffness: 280 }}
+              className="fixed bottom-0 left-0 right-0 bg-slate-900 border-t border-slate-700/50 rounded-t-2xl z-[90] max-w-lg mx-auto safe-area-bottom flex flex-col font-mono"
+              style={{ height: '85dvh', maxHeight: '85dvh' }}
+            >
+              <div className="p-5 pb-3 shrink-0 flex items-center justify-between border-b border-slate-800">
+                <div className="flex items-center gap-2">
+                  <IoSettings className="text-cyan-400" size={18} />
+                  <h3 className="text-sm font-bold text-white tracking-widest uppercase">SYSTEM SETTINGS</h3>
+                </div>
+                <button onClick={() => setShowSettings(false)} className="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-slate-200 rounded-xl bg-slate-800/40"><IoClose size={20} /></button>
+              </div>
+
+              {/* Scrollable Settings Panel */}
+              <div className="flex-1 overflow-y-auto p-5 space-y-6 scrollbar-thin">
+                
+                {/* Metabolic Profile Info */}
+                <div className="bg-slate-800/95 border border-slate-700 rounded-2xl p-5 space-y-3.5 shadow-lg">
+                  <div className="flex items-center gap-2 border-b border-slate-700 pb-2">
+                    <IoScale className="text-cyan-400" size={16} />
+                    <span className="text-[10px] font-bold text-cyan-300 tracking-wider">YOUR METABOLIC PROFILE</span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3.5 text-xs font-semibold">
+                    <div className="bg-slate-900/60 p-3 rounded-xl border border-slate-800/60 shadow-inner">
+                      <span className="text-[8px] text-slate-500 block uppercase font-bold tracking-wider">HEIGHT / AGE</span>
+                      <span className="text-slate-200 font-bold font-mono mt-0.5 block">{profile.height} cm / {profile.age} yrs</span>
+                    </div>
+                    <div className="bg-slate-900/60 p-3 rounded-xl border border-slate-800/60 shadow-inner">
+                      <span className="text-[8px] text-slate-500 block uppercase font-bold tracking-wider">CURRENT MASS</span>
+                      <span className="text-slate-200 font-bold font-mono mt-0.5 block">{profile.currentWeight} kg</span>
+                    </div>
+                    <div className="bg-slate-900/60 p-3 rounded-xl border border-slate-800/60 shadow-inner">
+                      <span className="text-[8px] text-slate-500 block uppercase font-bold tracking-wider">TARGET MASS</span>
+                      <span className="text-pink-400 font-bold font-mono mt-0.5 block">{profile.targetWeight} kg</span>
+                    </div>
+                    <div className="bg-slate-900/60 p-3 rounded-xl border border-slate-800/60 shadow-inner">
+                      <span className="text-[8px] text-slate-500 block uppercase font-bold tracking-wider">CALORIE INTAKE</span>
+                      <span className="text-cyan-300 font-bold font-mono mt-0.5 block">{profile.calorieTarget} kcal/d</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Primary Setting Actions */}
+                <div className="space-y-3">
+                  <button
+                    onClick={() => { setIsEditingProfile(true); }}
+                    className="w-full py-4 bg-slate-800 hover:bg-slate-750 border border-slate-700 text-slate-200 hover:text-white rounded-2xl text-xs font-bold tracking-widest transition-all min-h-[52px] flex items-center justify-center gap-2.5 uppercase shadow-md"
+                  >
+                    <IoSpeedometer className="text-cyan-400" size={16} />
+                    Modify Goals & Profile
+                  </button>
+
+                  <button
+                    onClick={() => setShowWipeConfirm(true)}
+                    className="w-full py-4 bg-slate-800 hover:bg-slate-750 border border-slate-700 text-slate-200 hover:text-white rounded-2xl text-xs font-bold tracking-widest transition-all min-h-[52px] flex items-center justify-center gap-2.5 uppercase shadow-md"
+                  >
+                    <IoRefresh className="text-amber-400" size={16} />
+                    Fresh Start / Reset Logs
+                  </button>
+                </div>
+              </div>
+
+              {/* Exit Terminal Action */}
+              <div className="p-5 border-t border-slate-800 bg-slate-900 shrink-0">
+                <button
+                  onClick={handleLogout}
+                  className="w-full py-4 bg-gradient-to-r from-red-700 to-red-600 hover:from-red-600 hover:to-red-500 text-white rounded-2xl text-xs font-bold tracking-widest transition-all min-h-[52px] flex items-center justify-center gap-2 uppercase shadow-lg shadow-red-500/10"
+                >
+                  <IoLogOut size={16} />
+                  Exit Terminal (Logout)
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Fresh Start / Reset Database Confirmation Modal */}
+      <AnimatePresence>
+        {showWipeConfirm && (
+          <>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowWipeConfirm(false)}
+              className="fixed inset-0 bg-black/80 backdrop-blur-md z-[100]" />
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
+              className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-slate-900 border border-amber-500/30 rounded-2xl p-6 z-[110] max-w-xs w-full text-center shadow-2xl shadow-amber-500/10 font-mono"
+            >
+              <span className="text-3xl block mb-2">⚠️</span>
+              <h4 className="text-sm font-bold text-white tracking-widest uppercase mb-2">FRESH START?</h4>
+              <p className="text-[10px] text-slate-400 mb-5 uppercase leading-normal">
+                This action will delete all food logs, weight entries, custom foods, and target goals. This cannot be undone!
+              </p>
+              <div className="flex gap-2.5">
+                <button
+                  onClick={() => setShowWipeConfirm(false)}
+                  className="flex-1 py-3 rounded-xl text-[11px] text-slate-400 bg-slate-800 hover:bg-slate-700 border border-slate-750 transition-colors min-h-[42px] uppercase font-bold"
+                >
+                  CANCEL
+                </button>
+                <button
+                  onClick={async () => {
+                    await wipeAllUserData(user.uid);
+                    setShowWipeConfirm(false);
+                    setShowSettings(false);
+                    setProfile(null); // Triggers re-onboarding setup instantly!
+                    setActiveTab(0); // Reset active tab back to Mission Control!
+                  }}
+                  className="flex-1 py-3 rounded-xl text-[11px] text-white bg-amber-600 hover:bg-amber-500 transition-colors min-h-[42px] uppercase font-bold shadow-lg shadow-amber-500/20"
+                >
+                  WIPE DATA
+                </button>
+              </div>
             </motion.div>
           </>
         )}

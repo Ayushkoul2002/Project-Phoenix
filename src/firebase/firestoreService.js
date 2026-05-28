@@ -389,3 +389,26 @@ export const subscribeUserProfile = (uid, callback) => {
     }
   });
 };
+
+/**
+ * Wipe all user data (logs, weight, foods, and profile) for a clean fresh start.
+ */
+export const wipeAllUserData = async (uid) => {
+  if (useMock) {
+    localStorage.removeItem(`foodLogs_${uid}`);
+    localStorage.removeItem(`weightLogs_${uid}`);
+    localStorage.removeItem(`customFoods_${uid}`);
+    localStorage.removeItem(`profile_${uid}`);
+    notifyListeners('foodLogs');
+    notifyListeners('weightLogs');
+    notifyListeners('customFoods');
+    if (mockListeners.profile) {
+      mockListeners.profile.forEach((cb) => cb());
+    }
+    return;
+  }
+
+  // Deleting user profile doc in Firestore immediately triggers setup wizard
+  const ref = doc(db, 'users', uid, 'profile', 'config');
+  return deleteDoc(ref);
+};

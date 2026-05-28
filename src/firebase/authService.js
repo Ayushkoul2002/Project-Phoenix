@@ -7,6 +7,7 @@ import {
   createUserWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
+  sendPasswordResetEmail,
 } from 'firebase/auth';
 import { auth, useMock } from './config';
 
@@ -119,4 +120,19 @@ export const onAuthChange = (callback) => {
     };
   }
   return onAuthStateChanged(auth, callback);
+};
+
+/**
+ * Send password reset email for an agent.
+ */
+export const resetUserPassword = async (email) => {
+  if (useMock) {
+    await new Promise((res) => setTimeout(res, 600));
+    const users = getMockUsers();
+    if (!users[email.toLowerCase()]) {
+      throw { code: 'auth/user-not-found', message: 'AGENT NOT FOUND' };
+    }
+    return;
+  }
+  return sendPasswordResetEmail(auth, email);
 };
