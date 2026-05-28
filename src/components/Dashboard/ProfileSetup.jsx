@@ -116,6 +116,50 @@ const ProfileSetup = ({ uid, onComplete, onCancel }) => {
 
   const targets = calculateTargets();
 
+  const handleAgeBlur = () => {
+    if (age === '') { setAge(24); return; }
+    const parsed = Number(age);
+    if (parsed < 12) setAge(12);
+    else if (parsed > 90) setAge(90);
+  };
+
+  const handleHeightBlur = () => {
+    if (height === '') { setHeight(170); return; }
+    const parsed = Number(height);
+    if (parsed < 100) setHeight(100);
+    else if (parsed > 230) setHeight(230);
+  };
+
+  const handleWeightBlur = () => {
+    if (weight === '') { setWeight(60.0); return; }
+    const parsed = Number(weight);
+    if (parsed < 30) setWeight(30);
+    else if (parsed > 230) setWeight(230);
+  };
+
+  const handleTargetWeightBlur = () => {
+    if (targetWeight === '') { setTargetWeight(65.0); return; }
+    const parsed = Number(targetWeight);
+    if (parsed < 30) setTargetWeight(30);
+    else if (parsed > 230) setTargetWeight(230);
+  };
+
+  const isStepValid = () => {
+    if (step === 1) {
+      return age !== '' && Number(age) >= 12 && Number(age) <= 90;
+    }
+    if (step === 2) {
+      return (
+        height !== '' && Number(height) >= 100 && Number(height) <= 230 &&
+        weight !== '' && Number(weight) >= 30 && Number(weight) <= 230
+      );
+    }
+    if (step === 3) {
+      return targetWeight !== '' && Number(targetWeight) >= 30 && Number(targetWeight) <= 230;
+    }
+    return true;
+  };
+
   const handleNext = () => {
     if (step === 1) {
       const parsedAge = Number(age);
@@ -233,9 +277,10 @@ const ProfileSetup = ({ uid, onComplete, onCancel }) => {
                       type="number" min="12" max="90" value={age}
                       onChange={(e) => {
                         const val = e.target.value;
-                        setAge(val === '' ? '' : Math.min(90, Number(val)));
+                        setAge(val === '' ? '' : Number(val));
                       }}
-                    className="w-16 bg-slate-50 border border-slate-200 rounded-xl px-2 py-1 text-center text-base font-extrabold text-cyan-600 focus:outline-none focus:border-cyan-500"
+                      onBlur={handleAgeBlur}
+                      className="w-16 bg-slate-50 border border-slate-200 rounded-xl px-2 py-1 text-center text-base font-extrabold text-cyan-600 focus:outline-none focus:border-cyan-500"
                     />
                     <span className="text-xs text-slate-400 font-bold">yrs</span>
                   </div>
@@ -248,6 +293,11 @@ const ProfileSetup = ({ uid, onComplete, onCancel }) => {
                   />
                   <span className="text-[10px] text-slate-400 font-bold">90</span>
                 </div>
+                {(age !== '' && (Number(age) < 12 || Number(age) > 90)) && (
+                  <p className="text-[10px] font-bold text-red-500 mt-2 uppercase tracking-wide">
+                    ⚠️ Age must be between 12 and 90 years.
+                  </p>
+                )}
               </div>
 
               {/* Gender Choice */}
@@ -288,9 +338,10 @@ const ProfileSetup = ({ uid, onComplete, onCancel }) => {
                       type="number" min="100" max="230" value={height}
                       onChange={(e) => {
                         const val = e.target.value;
-                        setHeight(val === '' ? '' : Math.min(230, Number(val)));
+                        setHeight(val === '' ? '' : Number(val));
                       }}
-                    className="w-20 bg-slate-50 border border-slate-200 rounded-xl px-2 py-1 text-center text-base font-extrabold text-cyan-600 focus:outline-none focus:border-cyan-500"
+                      onBlur={handleHeightBlur}
+                      className="w-20 bg-slate-50 border border-slate-200 rounded-xl px-2 py-1 text-center text-base font-extrabold text-cyan-600 focus:outline-none focus:border-cyan-500"
                     />
                     <span className="text-xs text-slate-400 font-bold">cm</span>
                   </div>
@@ -303,6 +354,11 @@ const ProfileSetup = ({ uid, onComplete, onCancel }) => {
                   />
                   <span className="text-[10px] text-slate-400 font-bold">230</span>
                 </div>
+                {(height !== '' && (Number(height) < 100 || Number(height) > 230)) && (
+                  <p className="text-[10px] font-bold text-red-500 mt-2 uppercase tracking-wide">
+                    ⚠️ Height must be between 100cm and 230cm.
+                  </p>
+                )}
               </div>
 
               {/* Current Weight Input */}
@@ -314,12 +370,18 @@ const ProfileSetup = ({ uid, onComplete, onCancel }) => {
                     type="number" step="0.1" min="30" max="230" value={weight}
                     onChange={(e) => {
                       const val = e.target.value;
-                      setWeight(val === '' ? '' : Math.min(230, Number(val)));
+                      setWeight(val === '' ? '' : Number(val));
                     }}
+                    onBlur={handleWeightBlur}
                     className="flex-1 bg-slate-50 border border-slate-200 rounded-xl py-3 text-center text-xl font-bold font-mono text-cyan-600 focus:outline-none focus:border-cyan-500"
                   />
                   <button type="button" onClick={() => setWeight(Number((activeWeight + 0.5).toFixed(1)))} className="w-12 h-12 bg-slate-100 border border-slate-200 hover:bg-slate-200 active:scale-95 text-slate-700 font-black rounded-xl text-xl flex items-center justify-center shadow-sm">+</button>
                 </div>
+                {(weight !== '' && (Number(weight) < 30 || Number(weight) > 230)) && (
+                  <p className="text-[10px] font-bold text-red-500 mt-2 uppercase tracking-wide text-center">
+                    ⚠️ Weight must be between 30kg and 230kg.
+                  </p>
+                )}
               </div>
             </motion.div>
           )}
@@ -341,12 +403,18 @@ const ProfileSetup = ({ uid, onComplete, onCancel }) => {
                     type="number" step="0.1" min="30" max="230" value={targetWeight}
                     onChange={(e) => {
                       const val = e.target.value;
-                      setTargetWeight(val === '' ? '' : Math.min(230, Number(val)));
+                      setTargetWeight(val === '' ? '' : Number(val));
                     }}
+                    onBlur={handleTargetWeightBlur}
                     className="flex-1 bg-slate-50 border border-slate-200 rounded-xl py-3 text-center text-xl font-bold font-mono text-cyan-600 focus:outline-none focus:border-cyan-500"
                   />
                   <button type="button" onClick={() => setTargetWeight(Number((activeTargetWeight + 0.5).toFixed(1)))} className="w-12 h-12 bg-slate-100 border border-slate-200 hover:bg-slate-200 active:scale-95 text-slate-700 font-black rounded-xl text-xl flex items-center justify-center shadow-sm">+</button>
                 </div>
+                {(targetWeight !== '' && (Number(targetWeight) < 30 || Number(targetWeight) > 230)) && (
+                  <p className="text-[10px] font-bold text-red-500 mt-2 uppercase tracking-wide text-center">
+                    ⚠️ Target weight must be between 30kg and 230kg.
+                  </p>
+                )}
                 <div className="flex justify-between items-center px-1 text-[10px] font-bold tracking-wider">
                   <span className="text-slate-500">PLAN STRATEGY:</span>
                   {activeTargetWeight > activeWeight ? (
@@ -489,15 +557,23 @@ const ProfileSetup = ({ uid, onComplete, onCancel }) => {
 
         {step < 5 ? (
           <button
-            type="button" onClick={handleNext}
-            className="flex-1 py-3.5 bg-gradient-to-r from-cyan-600 to-cyan-500 hover:from-cyan-500 hover:to-cyan-400 text-white rounded-xl text-xs font-bold tracking-widest transition-all min-h-[50px] flex items-center justify-center gap-1.5 uppercase shadow-md shadow-cyan-500/10"
+            type="button" onClick={handleNext} disabled={!isStepValid()}
+            className={`flex-1 py-3.5 rounded-xl text-xs font-bold tracking-widest transition-all min-h-[50px] flex items-center justify-center gap-1.5 uppercase shadow-md ${
+              isStepValid() 
+                ? 'bg-gradient-to-r from-cyan-600 to-cyan-500 hover:from-cyan-500 hover:to-cyan-400 text-white shadow-cyan-500/10 cursor-pointer' 
+                : 'bg-slate-200 text-slate-400 border border-slate-300 cursor-not-allowed opacity-60'
+            }`}
           >
             NEXT <IoChevronForward size={16} />
           </button>
         ) : (
           <button
-            type="button" onClick={handleSubmit} disabled={saving}
-            className="flex-1 py-3.5 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white rounded-xl text-xs font-bold tracking-widest transition-all min-h-[50px] flex items-center justify-center gap-1.5 uppercase shadow-md shadow-emerald-500/15"
+            type="button" onClick={handleSubmit} disabled={saving || !isStepValid()}
+            className={`flex-1 py-3.5 rounded-xl text-xs font-bold tracking-widest transition-all min-h-[50px] flex items-center justify-center gap-1.5 uppercase shadow-md ${
+              isStepValid() 
+                ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white shadow-emerald-500/15 cursor-pointer' 
+                : 'bg-slate-200 text-slate-400 border border-slate-300 cursor-not-allowed opacity-60'
+            }`}
           >
             {saving ? 'CONFIGURING...' : 'CRUSH GOALS'}
           </button>
