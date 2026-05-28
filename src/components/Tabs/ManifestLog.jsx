@@ -11,9 +11,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { IoTrash, IoFlame, IoNutrition, IoChevronBack, IoChevronForward, IoCalendar } from 'react-icons/io5';
 import { subscribeDateFoodLogs, deleteFoodLog } from '../../firebase/firestoreService';
 
-const CALORIE_TARGET = 2436;
-const PROTEIN_TARGET = 100;
-
 const MONTHS = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
 const DAYS_SHORT = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"];
 
@@ -37,7 +34,7 @@ const isToday = (date) => {
   return date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth() && date.getDate() === now.getDate();
 };
 
-const ManifestLog = ({ uid, selectedDate, setSelectedDate }) => {
+const ManifestLog = ({ uid, selectedDate, setSelectedDate, profile }) => {
   const [foodLogs, setFoodLogs] = useState([]);
   const [deleting, setDeleting] = useState(null);
   
@@ -50,10 +47,13 @@ const ManifestLog = ({ uid, selectedDate, setSelectedDate }) => {
     return () => unsub();
   }, [uid, selectedDate]);
 
+  const calorieTarget = profile?.calorieTarget || 2436;
+  const proteinTarget = profile?.proteinTarget || 100;
+
   const totalCalories = foodLogs.reduce((sum, l) => sum + (l.calories || 0), 0);
   const totalProtein = foodLogs.reduce((sum, l) => sum + (l.protein || 0), 0);
-  const caloriePercent = Math.min((totalCalories / CALORIE_TARGET) * 100, 100);
-  const isOverdrive = totalCalories > CALORIE_TARGET;
+  const caloriePercent = Math.min((totalCalories / calorieTarget) * 100, 100);
+  const isOverdrive = totalCalories > calorieTarget;
 
   const radius = 50;
   const circumference = 2 * Math.PI * radius;
@@ -156,7 +156,7 @@ const ManifestLog = ({ uid, selectedDate, setSelectedDate }) => {
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             <span className="text-base font-extrabold font-mono text-white leading-none">{totalCalories}</span>
-            <span className="text-[8px] font-mono text-slate-500 mt-0.5">/{CALORIE_TARGET}</span>
+            <span className="text-[8px] font-mono text-slate-500 mt-0.5">/{calorieTarget}</span>
           </div>
         </div>
 
@@ -167,7 +167,7 @@ const ManifestLog = ({ uid, selectedDate, setSelectedDate }) => {
             <div className="flex-1">
               <div className="flex justify-between items-center leading-none">
                 <span className="text-[8px] font-mono text-slate-500 tracking-wider">CALORIES</span>
-                <span className="text-[10px] font-mono font-bold text-emerald-400">{totalCalories} / {CALORIE_TARGET} kcal</span>
+                <span className="text-[10px] font-mono font-bold text-emerald-400">{totalCalories} / {calorieTarget} kcal</span>
               </div>
               <div className="h-1.5 bg-slate-950 rounded-full overflow-hidden mt-1.5 border border-slate-850">
                 <motion.div className="h-full rounded-full bg-gradient-to-r from-emerald-600 to-emerald-400"
@@ -181,18 +181,18 @@ const ManifestLog = ({ uid, selectedDate, setSelectedDate }) => {
             <div className="flex-1">
               <div className="flex justify-between items-center leading-none">
                 <span className="text-[8px] font-mono text-slate-500 tracking-wider">PROTEIN</span>
-                <span className="text-[10px] font-mono font-bold text-cyan-400">{totalProtein.toFixed(1)}g / {PROTEIN_TARGET}g</span>
+                <span className="text-[10px] font-mono font-bold text-cyan-400">{totalProtein.toFixed(1)}g / {proteinTarget}g</span>
               </div>
               <div className="h-1.5 bg-slate-950 rounded-full overflow-hidden mt-1.5 border border-slate-850">
                 <motion.div className="h-full rounded-full bg-gradient-to-r from-cyan-600 to-cyan-400"
-                  initial={{ width: 0 }} animate={{ width: `${Math.min((totalProtein / PROTEIN_TARGET) * 100, 100)}%` }} transition={{ duration: 0.6 }}
+                  initial={{ width: 0 }} animate={{ width: `${Math.min((totalProtein / proteinTarget) * 100, 100)}%` }} transition={{ duration: 0.6 }}
                 />
               </div>
             </div>
           </div>
           {isOverdrive && (
             <span className="text-[8px] font-mono font-bold text-fuchsia-400 overdrive-pulse bg-fuchsia-500/10 px-2.5 py-0.5 rounded-full border border-fuchsia-500/20 inline-block mt-1">
-              ⚡ OVERDRIVE +{totalCalories - CALORIE_TARGET} kcal
+              ⚡ OVERDRIVE +{totalCalories - calorieTarget} kcal
             </span>
           )}
         </div>

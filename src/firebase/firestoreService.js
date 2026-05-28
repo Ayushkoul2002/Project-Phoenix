@@ -9,6 +9,7 @@
 import {
   collection,
   addDoc,
+  setDoc,
   deleteDoc,
   doc,
   query,
@@ -334,5 +335,57 @@ export const subscribeCustomFoods = (uid, callback) => {
       ...d.data(),
     }));
     callback(foods);
+  });
+};
+
+// ─── User Profile ─────────────────────────────
+// Document: users/{uid}/profile/config
+
+/**
+ * Set/update the user's biological profile and calorie targets.
+ */
+export const updateUserProfile = async (uid, profileData) => {
+  if (useMock) {
+    const key = `profile_${uid}`;
+    saveMockData(key, profileData);
+    if (!mockListeners.profile) {
+      mockListeners.profile = new Set();
+    }
+    mockListeners.profile.forEach((cb) => cb());
+    return profileData;
+  }
+
+  const ref = doc(db, 'users', uid, 'profile', 'config');
+  return setDoc(ref, {
+    ...profileData,
+    updatedAt: serverTimestamp(),
+  }, { merge: true });
+};
+
+/**
+ * Subscribe to the user's profile in real-time.
+ */
+export const subscribeUserProfile = (uid, callback) => {
+  if (useMock) {
+    const key = `profile_${uid}`;
+    const handler = () => {
+      const profile = getMockData(key, null);
+      callback(profile);
+    };
+    if (!mockListeners.profile) {
+      mockListeners.profile = new Set();
+    }
+    mockListeners.profile.add(handler);
+    handler();
+    return () => mockListeners.profile.delete(handler);
+  }
+
+  const ref = doc(db, 'users', uid, 'profile', 'config');
+  return onSnapshot(ref, (docSnap) => {
+    if (docSnap.exists()) {
+      callback(docSnap.data());
+    } else {
+      callback(null);
+    }
   });
 };

@@ -14,12 +14,13 @@ import {
 } from 'react-icons/io5';
 import { useAuth } from '../../context/AuthContext';
 import { logoutUser } from '../../firebase/authService';
-import { subscribeCustomFoods, subscribeAllFoodLogs, addFoodLog } from '../../firebase/firestoreService';
+import { subscribeCustomFoods, subscribeAllFoodLogs, addFoodLog, subscribeUserProfile } from '../../firebase/firestoreService';
 import defaultFoods from '../../data/defaultFoods';
 import MissionControl from '../Tabs/MissionControl';
 import QuestVault from '../Tabs/QuestVault';
 import ManifestLog from '../Tabs/ManifestLog';
 import Archive from '../Tabs/Archive';
+import ProfileSetup from './ProfileSetup';
 
 const tabs = [
   { id: 'mission', label: 'MISSION', icon: IoShieldCheckmark },
@@ -50,6 +51,19 @@ const Dashboard = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [direction, setDirection] = useState(0);
   const [selectedDate, setSelectedDate] = useState(new Date());
+
+  const [profile, setProfile] = useState(null);
+  const [profileLoading, setProfileLoading] = useState(true);
+
+  // Subscribe to user profile
+  useEffect(() => {
+    if (!user) return;
+    const unsub = subscribeUserProfile(user.uid, (data) => {
+      setProfile(data);
+      setProfileLoading(false);
+    });
+    return () => unsub();
+  }, [user]);
 
   // Quick Log FAB States
   const [showFAB, setShowFAB] = useState(false);
@@ -137,13 +151,26 @@ const Dashboard = () => {
 
   const renderTab = () => {
     switch (activeTab) {
-      case 0: return <MissionControl uid={user.uid} selectedDate={selectedDate} />;
-      case 1: return <QuestVault uid={user.uid} selectedDate={selectedDate} />;
-      case 2: return <ManifestLog uid={user.uid} selectedDate={selectedDate} setSelectedDate={setSelectedDate} />;
-      case 3: return <Archive uid={user.uid} />;
+      case 0: return <MissionControl uid={user.uid} selectedDate={selectedDate} profile={profile} />;
+      case 1: return <QuestVault uid={user.uid} selectedDate={selectedDate} profile={profile} />;
+      case 2: return <ManifestLog uid={user.uid} selectedDate={selectedDate} setSelectedDate={setSelectedDate} profile={profile} />;
+      case 3: return <Archive uid={user.uid} profile={profile} />;
       default: return null;
     }
   };
+
+  if (profileLoading) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center font-mono text-slate-400">
+        <span className="w-4 h-4 border-2 border-slate-700 border-t-cyan-400 rounded-full animate-spin mb-3" />
+        <span className="text-[10px] tracking-[0.2em] text-cyan-400 animate-pulse">CONNECTING INTERFACE...</span>
+      </div>
+    );
+  }
+
+  if (!profile) {
+    return <ProfileSetup uid={user.uid} onComplete={(data) => setProfile(data)} />;
+  }
 
   return (
     <div className="min-h-screen min-h-[100dvh] bg-slate-950 text-slate-300 flex flex-col">

@@ -17,13 +17,21 @@ const WEIGHT_GOAL = 49.0;
 const DEADLINE = new Date('2026-10-28T00:00:00');
 const CHALLENGE_START = new Date('2026-05-28');
 
-const MissionControl = ({ uid, selectedDate }) => {
+const MissionControl = ({ uid, selectedDate, profile }) => {
   const [todayLogs, setTodayLogs] = useState([]);
   const [allFoodLogs, setAllFoodLogs] = useState([]);
   const [weightLogs, setWeightLogs] = useState([]);
   const [countdown, setCountdown] = useState({ d: 0, h: 0, m: 0, s: 0 });
 
   const isToday = !selectedDate || selectedDate.toDateString() === new Date().toDateString();
+
+  // Dynamic Targets from User Profile with safe fallbacks
+  const calorieTarget = profile?.calorieTarget || 2436;
+  const proteinTarget = profile?.proteinTarget || 100;
+  const weightStart = profile?.currentWeight || 41.0;
+  const weightGoal = profile?.targetWeight || 49.0;
+  const deadlineDate = profile?.deadline ? new Date(profile.deadline) : new Date('2026-10-28T00:00:00');
+  const challengeStart = profile?.updatedAt?.toDate ? profile.updatedAt.toDate() : (profile?.updatedAt ? new Date(profile.updatedAt) : new Date('2026-05-28'));
 
   useEffect(() => { const u = subscribeDateFoodLogs(uid, selectedDate || new Date(), setTodayLogs); return () => u(); }, [uid, selectedDate]);
   useEffect(() => { const u = subscribeAllFoodLogs(uid, setAllFoodLogs); return () => u(); }, [uid]);
@@ -32,30 +40,30 @@ const MissionControl = ({ uid, selectedDate }) => {
   useEffect(() => {
     const tick = () => {
       const now = new Date();
-      const diff = Math.max(0, DEADLINE - now);
+      const diff = Math.max(0, deadlineDate - now);
       setCountdown({ d: Math.floor(diff / 86400000), h: Math.floor((diff % 86400000) / 3600000), m: Math.floor((diff % 3600000) / 60000), s: Math.floor((diff % 60000) / 1000) });
     };
     tick();
     const iv = setInterval(tick, 1000);
     return () => clearInterval(iv);
-  }, []);
+  }, [deadlineDate]);
 
   // Stats
   const todayCal = todayLogs.reduce((s, l) => s + (l.calories || 0), 0);
   const todayPro = todayLogs.reduce((s, l) => s + (l.protein || 0), 0);
-  const isOverdrive = todayCal > CALORIE_TARGET;
-  const caloriePercent = Math.min((todayCal / CALORIE_TARGET) * 100, 100);
-  const proteinPercent = Math.min((todayPro / PROTEIN_TARGET) * 100, 100);
+  const isOverdrive = todayCal > calorieTarget;
+  const caloriePercent = Math.min((todayCal / calorieTarget) * 100, 100);
+  const proteinPercent = Math.min((todayPro / proteinTarget) * 100, 100);
 
-  const latestWeight = weightLogs.length > 0 ? weightLogs[weightLogs.length - 1].weight : WEIGHT_START;
-  const weightProgress = Math.max(0, Math.min(100, ((latestWeight - WEIGHT_START) / (WEIGHT_GOAL - WEIGHT_START)) * 100));
-  const weightToGo = (WEIGHT_GOAL - latestWeight).toFixed(1);
+  const latestWeight = weightLogs.length > 0 ? weightLogs[weightLogs.length - 1].weight : weightStart;
+  const weightProgress = Math.max(0, Math.min(100, ((latestWeight - weightStart) / (weightGoal - weightStart)) * 100));
+  const weightToGo = (weightGoal - latestWeight).toFixed(1);
 
   const totalCalEver = allFoodLogs.reduce((s, l) => s + (l.calories || 0), 0);
   const totalMeals = allFoodLogs.length;
   const now = new Date();
-  const daysSinceStart = Math.max(1, Math.floor((now - CHALLENGE_START) / 86400000));
-  const totalDays = Math.floor((DEADLINE - CHALLENGE_START) / 86400000);
+  const daysSinceStart = Math.max(1, Math.floor((now - challengeStart) / 86400000));
+  const totalDays = Math.max(1, Math.floor((deadlineDate - challengeStart) / 86400000));
   const avgDaily = totalMeals > 0 ? Math.round(totalCalEver / daysSinceStart) : 0;
 
   const dailyCals = {};
@@ -64,7 +72,7 @@ const MissionControl = ({ uid, selectedDate }) => {
     const k = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
     dailyCals[k] = (dailyCals[k] || 0) + (l.calories || 0);
   });
-  const daysHit = Object.values(dailyCals).filter((c) => c >= CALORIE_TARGET).length;
+  const daysHit = Object.values(dailyCals).filter((c) => c >= calorieTarget).length;
   const daysLogged = Object.keys(dailyCals).length;
 
   // SVG ring
@@ -90,7 +98,7 @@ const MissionControl = ({ uid, selectedDate }) => {
           ))}
         </div>
         <div className="text-[9px] font-mono text-slate-500 tracking-wider mt-3 bg-slate-900/40 border border-slate-800/30 rounded-full px-3.5 py-1 inline-block">
-          DAY <span className="text-cyan-400 font-bold">{daysSinceStart}</span> OF <span className="text-slate-400">{totalDays}</span> • <span className="text-emerald-400 font-bold">{Math.floor((DEADLINE - now) / 86400000)} DAYS</span> REMAINING
+          DAY <span className="text-cyan-400 font-bold">{daysSinceStart}</span> OF <span className="text-slate-400">{totalDays}</span> • <span className="text-emerald-400 font-bold">{Math.max(0, Math.floor((deadlineDate - now) / 86400000))} DAYS</span> REMAINING
         </div>
       </div>
 
@@ -122,10 +130,10 @@ const MissionControl = ({ uid, selectedDate }) => {
               <span className="text-[9px] font-mono font-bold text-amber-400 tracking-widest mb-1">HISTORICAL RECORD</span>
             )}
             <span className="text-4xl font-extrabold font-mono text-white tracking-tighter leading-none">{todayCal}</span>
-            <span className="text-[11px] font-mono text-slate-500 mt-1">/ {CALORIE_TARGET} kcal</span>
+            <span className="text-[11px] font-mono text-slate-500 mt-1">/ {calorieTarget} kcal</span>
             {isOverdrive && (
               <span className="text-[9px] font-mono text-fuchsia-400 mt-1 bg-fuchsia-500/10 px-2.5 py-0.5 rounded-full border border-fuchsia-500/20">
-                +{todayCal - CALORIE_TARGET} surplus
+                +{todayCal - calorieTarget} surplus
               </span>
             )}
           </div>
@@ -141,7 +149,7 @@ const MissionControl = ({ uid, selectedDate }) => {
               <span className="text-[9px] font-mono text-slate-500 uppercase tracking-wider">PROTEIN</span>
               <span className="text-xs font-bold font-mono text-emerald-400">{todayPro.toFixed(0)}g</span>
             </div>
-            <div className="text-[9px] font-mono text-slate-600">Goal: {PROTEIN_TARGET}g</div>
+            <div className="text-[9px] font-mono text-slate-600">Goal: {proteinTarget}g</div>
           </div>
           <div className="mt-4">
             <div className="h-2 bg-slate-950 rounded-full overflow-hidden border border-slate-800/40">
@@ -165,7 +173,7 @@ const MissionControl = ({ uid, selectedDate }) => {
               <motion.div className="h-full rounded-full bg-gradient-to-r from-cyan-600 to-cyan-400" initial={{ width: 0 }} animate={{ width: `${weightProgress}%` }} transition={{ duration: 0.8 }} />
             </div>
             <div className="flex justify-between items-center mt-1.5">
-              <span className="text-[8px] font-mono text-slate-600">{WEIGHT_START}kg</span>
+              <span className="text-[8px] font-mono text-slate-600">{weightStart}kg</span>
               <span className="text-[8px] font-mono text-slate-500">{weightToGo}kg left</span>
             </div>
           </div>

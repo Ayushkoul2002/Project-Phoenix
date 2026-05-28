@@ -13,11 +13,7 @@ import {
 } from 'recharts';
 import { subscribeWeightLogs, addWeightLog, deleteWeightLog, subscribeAllFoodLogs } from '../../firebase/firestoreService';
 
-const WEIGHT_START = 41.0;
-const WEIGHT_GOAL = 49.0;
-const CALORIE_TARGET = 2436;
-const CHALLENGE_START = new Date('2026-05-28');
-const CHALLENGE_END = new Date('2026-10-28');
+
 
 const WeightTooltip = ({ active, payload, label }) => {
   if (active && payload?.[0]) return (
@@ -39,7 +35,7 @@ const CalTooltip = ({ active, payload, label }) => {
   return null;
 };
 
-const Archive = ({ uid }) => {
+const Archive = ({ uid, profile }) => {
   const [weightLogs, setWeightLogs] = useState([]);
   const [allFoodLogs, setAllFoodLogs] = useState([]);
   const [weightInput, setWeightInput] = useState('');
@@ -50,6 +46,12 @@ const Archive = ({ uid }) => {
 
   useEffect(() => { const u = subscribeWeightLogs(uid, setWeightLogs); return () => u(); }, [uid]);
   useEffect(() => { const u = subscribeAllFoodLogs(uid, setAllFoodLogs); return () => u(); }, [uid]);
+
+  const weightStart = profile?.currentWeight || 41.0;
+  const weightGoal = profile?.targetWeight || 49.0;
+  const calorieTarget = profile?.calorieTarget || 2436;
+  const challengeStart = profile?.updatedAt?.toDate ? profile.updatedAt.toDate() : (profile?.updatedAt ? new Date(profile.updatedAt) : new Date('2026-05-28'));
+  const challengeEnd = profile?.deadline ? new Date(profile.deadline) : new Date('2026-10-28');
 
   const handleLogWeight = async (e) => {
     e.preventDefault();
@@ -88,22 +90,22 @@ const Archive = ({ uid }) => {
   const calChartData = Object.entries(dailyCals).map(([date, calories]) => ({ date, calories }));
 
   // Stats
-  const latestWeight = weightLogs.length > 0 ? weightLogs[weightLogs.length - 1].weight : WEIGHT_START;
-  const firstWeight = weightLogs.length > 0 ? weightLogs[0].weight : WEIGHT_START;
+  const latestWeight = weightLogs.length > 0 ? weightLogs[weightLogs.length - 1].weight : weightStart;
+  const firstWeight = weightLogs.length > 0 ? weightLogs[0].weight : weightStart;
   const totalGain = (latestWeight - firstWeight).toFixed(1);
-  const weightToGo = (WEIGHT_GOAL - latestWeight).toFixed(1);
-  const weightPct = Math.max(0, Math.min(100, ((latestWeight - WEIGHT_START) / (WEIGHT_GOAL - WEIGHT_START)) * 100));
+  const weightToGo = (weightGoal - latestWeight).toFixed(1);
+  const weightPct = Math.max(0, Math.min(100, ((latestWeight - weightStart) / (weightGoal - weightStart)) * 100));
 
   const now = new Date();
-  const daysSince = Math.max(1, Math.floor((now - CHALLENGE_START) / 86400000));
-  const daysLeft = Math.max(0, Math.floor((CHALLENGE_END - now) / 86400000));
-  const totalDays = Math.floor((CHALLENGE_END - CHALLENGE_START) / 86400000);
+  const daysSince = Math.max(1, Math.floor((now - challengeStart) / 86400000));
+  const daysLeft = Math.max(0, Math.floor((challengeEnd - now) / 86400000));
+  const totalDays = Math.max(1, Math.floor((challengeEnd - challengeStart) / 86400000));
   const challengePct = Math.min(100, (daysSince / totalDays) * 100);
 
   const totalCalEver = allFoodLogs.reduce((s, l) => s + (l.calories || 0), 0);
   const uniqueDays = new Set(allFoodLogs.map((l) => { const d = l.timestamp?.toDate ? l.timestamp.toDate() : new Date(l.timestamp); return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`; })).size;
   const avgDaily = uniqueDays > 0 ? Math.round(totalCalEver / uniqueDays) : 0;
-  const daysHit = Object.values(dailyCals).filter((c) => c >= CALORIE_TARGET).length;
+  const daysHit = Object.values(dailyCals).filter((c) => c >= calorieTarget).length;
 
   return (
     <div className="px-4 pt-3 pb-6 max-w-lg mx-auto">
@@ -123,9 +125,9 @@ const Archive = ({ uid }) => {
           <motion.div className="h-full rounded-full bg-gradient-to-r from-cyan-600 to-fuchsia-500" initial={{ width: 0 }} animate={{ width: `${challengePct}%` }} transition={{ duration: 1 }} />
         </div>
         <div className="flex justify-between mt-0.5">
-          <span className="text-[7px] font-mono text-slate-600">MAY 28</span>
+          <span className="text-[7px] font-mono text-slate-600">{challengeStart.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }).toUpperCase()}</span>
           <span className="text-[7px] font-mono text-slate-600">{daysLeft}d left</span>
-          <span className="text-[7px] font-mono text-slate-600">OCT 28</span>
+          <span className="text-[7px] font-mono text-slate-600">{challengeEnd.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }).toUpperCase()}</span>
         </div>
       </div>
 
@@ -143,9 +145,9 @@ const Archive = ({ uid }) => {
           <motion.div className="h-full rounded-full bg-gradient-to-r from-emerald-600 to-emerald-400" initial={{ width: 0 }} animate={{ width: `${weightPct}%` }} transition={{ duration: 1 }} />
         </div>
         <div className="flex justify-between">
-          <span className="text-[7px] font-mono text-slate-600">{WEIGHT_START}kg</span>
+          <span className="text-[7px] font-mono text-slate-600">{weightStart}kg</span>
           <span className="text-[7px] font-mono text-slate-600">{weightToGo}kg to go</span>
-          <span className="text-[7px] font-mono text-slate-600">{WEIGHT_GOAL}kg</span>
+          <span className="text-[7px] font-mono text-slate-600">{weightGoal}kg</span>
         </div>
       </div>
 
@@ -178,7 +180,7 @@ const Archive = ({ uid }) => {
               <XAxis dataKey="date" tick={{ fontSize: 8, fontFamily: 'monospace', fill: '#64748b' }} axisLine={{ stroke: '#334155' }} tickLine={false} />
               <YAxis tick={{ fontSize: 8, fontFamily: 'monospace', fill: '#64748b' }} axisLine={{ stroke: '#334155' }} tickLine={false} domain={['dataMin - 1', 'dataMax + 1']} />
               <Tooltip content={<WeightTooltip />} />
-              <ReferenceLine y={WEIGHT_GOAL} stroke="#06b6d4" strokeDasharray="6 4" strokeWidth={1} />
+              <ReferenceLine y={weightGoal} stroke="#06b6d4" strokeDasharray="6 4" strokeWidth={1} />
               <Line type="monotone" dataKey="weight" stroke="#10b981" strokeWidth={2} dot={{ r: 3, fill: '#10b981', stroke: '#0f172a', strokeWidth: 2 }}
                 style={{ filter: 'drop-shadow(0 0 4px rgba(16,185,129,0.5))' }} />
             </LineChart>
@@ -196,7 +198,7 @@ const Archive = ({ uid }) => {
               <XAxis dataKey="date" tick={{ fontSize: 8, fontFamily: 'monospace', fill: '#64748b' }} axisLine={{ stroke: '#334155' }} tickLine={false} />
               <YAxis tick={{ fontSize: 8, fontFamily: 'monospace', fill: '#64748b' }} axisLine={{ stroke: '#334155' }} tickLine={false} />
               <Tooltip content={<CalTooltip />} />
-              <ReferenceLine y={CALORIE_TARGET} stroke="#f59e0b" strokeDasharray="6 4" strokeWidth={1} />
+              <ReferenceLine y={calorieTarget} stroke="#f59e0b" strokeDasharray="6 4" strokeWidth={1} />
               <defs><linearGradient id="calG" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#f59e0b" stopOpacity={0.3} /><stop offset="95%" stopColor="#f59e0b" stopOpacity={0.02} /></linearGradient></defs>
               <Area type="monotone" dataKey="calories" stroke="#f59e0b" strokeWidth={1.5} fill="url(#calG)" />
             </AreaChart>
