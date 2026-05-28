@@ -122,3 +122,14 @@ svg:focus {
   outline: none !important;
   -webkit-tap-highlight-color: transparent !important;
 }
+
+/* ─── Recharts Click-Through Elements ──────── */
+.recharts-dot,
+.recharts-active-dot,
+.recharts-line-dot,
+.recharts-area-dot,
+.recharts-sector,
+.recharts-curve,
+.recharts-tooltip-wrapper {
+  pointer-events: none !important;
+}
