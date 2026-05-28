@@ -216,7 +216,7 @@ const ManifestLog = ({ uid, selectedDate, setSelectedDate, profile }) => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20, height: 0 }}
               transition={{ duration: 0.2 }}
-              className="flex items-center gap-3 bg-white border border-slate-200 hover:border-slate-250 rounded-2xl px-4 py-3.5 min-h-[52px] transition-all hover:shadow-cyan-500/5 shadow-sm"
+              className="flex items-center gap-3 bg-white border border-slate-200 hover:border-slate-300 rounded-2xl px-4 py-3.5 min-h-[52px] transition-all hover:shadow-cyan-500/5 shadow-sm"
             >
               {/* Index Number Badge */}
               <div className="w-8 h-8 bg-slate-100 border border-slate-200 rounded-xl flex items-center justify-center shrink-0">
@@ -327,7 +327,7 @@ const ManifestLog = ({ uid, selectedDate, setSelectedDate, profile }) => {
                         isSel
                           ? 'bg-cyan-50 text-cyan-600 border border-cyan-300 shadow-sm shadow-cyan-500/10'
                           : isTod
-                          ? 'bg-slate-100 text-slate-700 border border-slate-250 hover:bg-slate-200 font-black shadow-inner'
+                          ? 'bg-slate-100 text-slate-700 border border-slate-200 hover:bg-slate-200 font-black shadow-inner'
                           : 'bg-transparent text-slate-450 hover:bg-slate-50 hover:text-slate-800'
                       }`}
                     >

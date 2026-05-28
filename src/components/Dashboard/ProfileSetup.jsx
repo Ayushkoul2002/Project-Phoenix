@@ -117,6 +117,23 @@ const ProfileSetup = ({ uid, onComplete, onCancel }) => {
   const targets = calculateTargets();
 
   const handleNext = () => {
+    if (step === 1) {
+      const parsedAge = Number(age);
+      if (parsedAge < 12) setAge(12);
+      else if (parsedAge > 90) setAge(90);
+    } else if (step === 2) {
+      const parsedHeight = Number(height);
+      const parsedWeight = Number(weight);
+      if (parsedHeight < 100) setHeight(100);
+      else if (parsedHeight > 230) setHeight(230);
+      
+      if (parsedWeight < 30) setWeight(30);
+      else if (parsedWeight > 230) setWeight(230);
+    } else if (step === 3) {
+      const parsedTargetWeight = Number(targetWeight);
+      if (parsedTargetWeight < 30) setTargetWeight(30);
+      else if (parsedTargetWeight > 230) setTargetWeight(230);
+    }
     if (step < 5) setStep(step + 1);
   };
 
@@ -127,12 +144,17 @@ const ProfileSetup = ({ uid, onComplete, onCancel }) => {
   const handleSubmit = async () => {
     setSaving(true);
     try {
+      const finalAge = Math.max(12, Math.min(90, Number(age) || 24));
+      const finalHeight = Math.max(100, Math.min(230, Number(height) || 170));
+      const finalWeight = Math.max(30, Math.min(230, Number(weight) || 60.0));
+      const finalTargetWeight = Math.max(30, Math.min(230, Number(targetWeight) || 65.0));
+
       const profileData = {
-        age: Number(age) || 24,
+        age: finalAge,
         gender,
-        height: Number(height) || 170,
-        currentWeight: Number(weight) || 60.0,
-        targetWeight: Number(targetWeight) || 65.0,
+        height: finalHeight,
+        currentWeight: finalWeight,
+        targetWeight: finalTargetWeight,
         activity,
         deadline,
         bmr: targets.bmr,
@@ -142,7 +164,7 @@ const ProfileSetup = ({ uid, onComplete, onCancel }) => {
       };
 
       await updateUserProfile(uid, profileData);
-      await addWeightLog(uid, Number(weight) || 60.0);
+      await addWeightLog(uid, finalWeight);
 
       if (onComplete) onComplete(profileData);
     } catch (e) {
@@ -213,7 +235,7 @@ const ProfileSetup = ({ uid, onComplete, onCancel }) => {
                         const val = e.target.value;
                         setAge(val === '' ? '' : Math.min(90, Number(val)));
                       }}
-                      className="w-16 bg-slate-50 border border-slate-250 rounded-xl px-2 py-1 text-center text-base font-extrabold text-cyan-600 focus:outline-none focus:border-cyan-500"
+                    className="w-16 bg-slate-50 border border-slate-200 rounded-xl px-2 py-1 text-center text-base font-extrabold text-cyan-600 focus:outline-none focus:border-cyan-500"
                     />
                     <span className="text-xs text-slate-400 font-bold">yrs</span>
                   </div>
@@ -268,7 +290,7 @@ const ProfileSetup = ({ uid, onComplete, onCancel }) => {
                         const val = e.target.value;
                         setHeight(val === '' ? '' : Math.min(230, Number(val)));
                       }}
-                      className="w-20 bg-slate-50 border border-slate-250 rounded-xl px-2 py-1 text-center text-base font-extrabold text-cyan-600 focus:outline-none focus:border-cyan-500"
+                    className="w-20 bg-slate-50 border border-slate-200 rounded-xl px-2 py-1 text-center text-base font-extrabold text-cyan-600 focus:outline-none focus:border-cyan-500"
                     />
                     <span className="text-xs text-slate-400 font-bold">cm</span>
                   </div>
@@ -287,16 +309,16 @@ const ProfileSetup = ({ uid, onComplete, onCancel }) => {
               <div className="space-y-3 bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
                 <label className="text-xs font-bold text-slate-700 tracking-wider block">CURRENT WEIGHT (KG)</label>
                 <div className="flex items-center gap-3">
-                  <button type="button" onClick={() => setWeight(Math.max(30, Number((activeWeight - 0.5).toFixed(1))))} className="w-12 h-12 bg-slate-100 border border-slate-250 hover:bg-slate-200 active:scale-95 text-slate-700 font-black rounded-xl text-xl flex items-center justify-center shadow-sm">−</button>
+                  <button type="button" onClick={() => setWeight(Math.max(30, Number((activeWeight - 0.5).toFixed(1))))} className="w-12 h-12 bg-slate-100 border border-slate-200 hover:bg-slate-200 active:scale-95 text-slate-700 font-black rounded-xl text-xl flex items-center justify-center shadow-sm">−</button>
                   <input
                     type="number" step="0.1" min="30" max="230" value={weight}
                     onChange={(e) => {
                       const val = e.target.value;
                       setWeight(val === '' ? '' : Math.min(230, Number(val)));
                     }}
-                    className="flex-1 bg-slate-50 border border-slate-250 rounded-xl py-3 text-center text-xl font-bold font-mono text-cyan-600 focus:outline-none focus:border-cyan-500"
+                    className="flex-1 bg-slate-50 border border-slate-200 rounded-xl py-3 text-center text-xl font-bold font-mono text-cyan-600 focus:outline-none focus:border-cyan-500"
                   />
-                  <button type="button" onClick={() => setWeight(Number((activeWeight + 0.5).toFixed(1)))} className="w-12 h-12 bg-slate-100 border border-slate-250 hover:bg-slate-200 active:scale-95 text-slate-700 font-black rounded-xl text-xl flex items-center justify-center shadow-sm">+</button>
+                  <button type="button" onClick={() => setWeight(Number((activeWeight + 0.5).toFixed(1)))} className="w-12 h-12 bg-slate-100 border border-slate-200 hover:bg-slate-200 active:scale-95 text-slate-700 font-black rounded-xl text-xl flex items-center justify-center shadow-sm">+</button>
                 </div>
               </div>
             </motion.div>
@@ -314,16 +336,16 @@ const ProfileSetup = ({ uid, onComplete, onCancel }) => {
               <div className="space-y-3 bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
                 <label className="text-xs font-bold text-slate-700 tracking-wider block">TARGET WEIGHT (KG)</label>
                 <div className="flex items-center gap-3">
-                  <button type="button" onClick={() => setTargetWeight(Math.max(30, Number((activeTargetWeight - 0.5).toFixed(1))))} className="w-12 h-12 bg-slate-100 border border-slate-250 hover:bg-slate-200 active:scale-95 text-slate-700 font-black rounded-xl text-xl flex items-center justify-center shadow-sm">−</button>
+                  <button type="button" onClick={() => setTargetWeight(Math.max(30, Number((activeTargetWeight - 0.5).toFixed(1))))} className="w-12 h-12 bg-slate-100 border border-slate-200 hover:bg-slate-200 active:scale-95 text-slate-700 font-black rounded-xl text-xl flex items-center justify-center shadow-sm">−</button>
                   <input
                     type="number" step="0.1" min="30" max="230" value={targetWeight}
                     onChange={(e) => {
                       const val = e.target.value;
                       setTargetWeight(val === '' ? '' : Math.min(230, Number(val)));
                     }}
-                    className="flex-1 bg-slate-50 border border-slate-250 rounded-xl py-3 text-center text-xl font-bold font-mono text-cyan-600 focus:outline-none focus:border-cyan-500"
+                    className="flex-1 bg-slate-50 border border-slate-200 rounded-xl py-3 text-center text-xl font-bold font-mono text-cyan-600 focus:outline-none focus:border-cyan-500"
                   />
-                  <button type="button" onClick={() => setTargetWeight(Number((activeTargetWeight + 0.5).toFixed(1)))} className="w-12 h-12 bg-slate-100 border border-slate-250 hover:bg-slate-200 active:scale-95 text-slate-700 font-black rounded-xl text-xl flex items-center justify-center shadow-sm">+</button>
+                  <button type="button" onClick={() => setTargetWeight(Number((activeTargetWeight + 0.5).toFixed(1)))} className="w-12 h-12 bg-slate-100 border border-slate-200 hover:bg-slate-200 active:scale-95 text-slate-700 font-black rounded-xl text-xl flex items-center justify-center shadow-sm">+</button>
                 </div>
                 <div className="flex justify-between items-center px-1 text-[10px] font-bold tracking-wider">
                   <span className="text-slate-500">PLAN STRATEGY:</span>
@@ -340,7 +362,7 @@ const ProfileSetup = ({ uid, onComplete, onCancel }) => {
               {/* Target Deadline Input */}
               <div className="space-y-3 bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
                 <label className="text-xs font-bold text-slate-700 tracking-wider block">TARGET DEADLINE DATE</label>
-                <div className="relative flex items-center bg-slate-50 border border-slate-250 rounded-xl px-4 py-3 shadow-inner">
+                <div className="relative flex items-center bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 shadow-inner">
                   <IoCalendar className="text-cyan-600 mr-3 shrink-0" size={18} />
                   <input
                     type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)}
@@ -455,7 +477,7 @@ const ProfileSetup = ({ uid, onComplete, onCancel }) => {
         {step > 1 ? (
           <button
             type="button" onClick={handlePrev}
-            className="flex-1 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-250 rounded-xl text-xs font-bold tracking-widest transition-all min-h-[50px] flex items-center justify-center gap-1.5 uppercase shadow-sm"
+            className="flex-1 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-xl text-xs font-bold tracking-widest transition-all min-h-[50px] flex items-center justify-center gap-1.5 uppercase shadow-sm"
           >
             <IoChevronBack size={16} /> BACK
           </button>

@@ -104,7 +104,7 @@ const QuestVault = ({ uid, selectedDate }) => {
       whileHover={{ scale: 1.01, backgroundColor: 'rgba(241, 245, 249, 0.6)' }}
       whileTap={{ scale: 0.99 }}
       onClick={() => { setSelectedFood(food); setServings(1); }}
-      className="w-full flex items-center justify-between bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-250 rounded-xl px-4 py-3 min-h-[44px] transition-all text-left shadow-sm cursor-pointer"
+      className="w-full flex items-center justify-between bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-300 rounded-xl px-4 py-3 min-h-[44px] transition-all text-left shadow-sm cursor-pointer"
     >
       <div className="flex-1 min-w-0 mr-2 flex items-center gap-1.5 font-sans">
         <span className="text-[13px] font-bold text-slate-800 truncate">{food.name}</span>
@@ -153,7 +153,7 @@ const QuestVault = ({ uid, selectedDate }) => {
       <button onClick={() => setShowAddCustom(!showAddCustom)}
         className="flex items-center gap-1.5 text-[9px] font-bold tracking-widest text-cyan-600 hover:text-cyan-750 transition-colors mb-3 py-1 min-h-[32px] uppercase cursor-pointer">
         {showAddCustom ? <IoChevronUp size={12} /> : <IoAdd size={12} />}
-        {showAddCustom ? 'DISMISS REPLICATOR' : 'INITIALIZE FOOD REPLICATOR'}
+        {showAddCustom ? 'CLOSE CUSTOM FORM' : 'ADD CUSTOM MEAL FORMULA'}
       </button>
 
       {/* Add Custom Form */}
@@ -164,7 +164,7 @@ const QuestVault = ({ uid, selectedDate }) => {
             <div className="space-y-3">
               <div className="flex items-center gap-1.5 border-b border-slate-100 pb-2 mb-2">
                 <span className="w-1.5 h-1.5 bg-cyan-500 rounded-full animate-ping" />
-                <span className="text-[8px] font-bold text-cyan-705 uppercase tracking-widest font-bold">REPLICATOR TERMINAL</span>
+                <span className="text-[8px] font-bold text-cyan-700 uppercase tracking-widest font-bold">NEW CUSTOM MEAL FORMULA</span>
               </div>
               <input type="text" value={customName} onChange={(e) => setCustomName(e.target.value)} placeholder="Enter food name..." required
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-sans text-slate-800 placeholder-slate-400 focus:outline-none focus:border-cyan-500 focus:bg-white box-border transition-all" />
@@ -181,7 +181,7 @@ const QuestVault = ({ uid, selectedDate }) => {
                 </div>
               </div>
               <button type="submit" className="w-full py-3 bg-gradient-to-r from-cyan-600 to-cyan-500 hover:from-cyan-500 hover:to-cyan-400 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-cyan-500/10 min-h-[44px] uppercase tracking-wider cursor-pointer">
-                Replicate Item
+                Save Custom Food
               </button>
             </div>
           </motion.form>
@@ -293,7 +293,7 @@ const QuestVault = ({ uid, selectedDate }) => {
                     setShowDeleteConfirm(false);
                     setSelectedFood(null); // Close the servings modal too!
                   }}
-                  className="flex-1 py-2.5 rounded-xl text-[11px] text-white bg-red-650 hover:bg-red-500 transition-colors min-h-[40px] uppercase font-bold shadow-lg shadow-red-500/20 cursor-pointer"
+                  className="flex-1 py-2.5 rounded-xl text-[11px] text-white bg-red-600 hover:bg-red-500 transition-colors min-h-[40px] uppercase font-bold shadow-lg shadow-red-500/20 cursor-pointer"
                 >
                   PURGE
                 </button>
