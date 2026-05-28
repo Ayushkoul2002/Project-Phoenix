@@ -32,8 +32,15 @@ const MissionControl = ({ uid, selectedDate, profile }) => {
   const weightGoal = profile?.targetWeight || 49.0;
 
   // Memoize date parsing to prevent infinite render loops!
-  const deadlineStr = profile?.deadline || '2026-10-28T00:00:00';
-  const deadlineDate = useMemo(() => new Date(deadlineStr), [deadlineStr]);
+  const deadlineStr = profile?.deadline || '2026-10-28';
+  const deadlineDate = useMemo(() => {
+    if (deadlineStr.length === 10 && deadlineStr.includes('-')) {
+      const [year, month, day] = deadlineStr.split('-').map(Number);
+      // Parse as local end of day to align with IST timezone
+      return new Date(year, month - 1, day, 23, 59, 59);
+    }
+    return new Date(deadlineStr);
+  }, [deadlineStr]);
 
   const challengeStartStr = profile?.updatedAt?.toDate 
     ? profile.updatedAt.toDate().toISOString() 

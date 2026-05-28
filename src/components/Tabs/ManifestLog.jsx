@@ -37,7 +37,7 @@ const isToday = (date) => {
 const ManifestLog = ({ uid, selectedDate, setSelectedDate, profile }) => {
   const [foodLogs, setFoodLogs] = useState([]);
   const [deleting, setDeleting] = useState(null);
-  const [confirmDelete, setConfirmDelete] = useState(null);
+  const [logToDelete, setLogToDelete] = useState(null);
   
   // Custom Calendar Modal State
   const [showCalendar, setShowCalendar] = useState(false);
@@ -70,7 +70,7 @@ const ManifestLog = ({ uid, selectedDate, setSelectedDate, profile }) => {
       console.error('Delete error:', e);
     } finally {
       setDeleting(null);
-      setConfirmDelete(null);
+      setLogToDelete(null);
     }
   };
 
@@ -241,25 +241,20 @@ const ManifestLog = ({ uid, selectedDate, setSelectedDate, profile }) => {
                   <span className="text-[6px] font-bold text-slate-400 block uppercase mt-0.5">PRO</span>
                 </div>
 
-                {/* Delete confirm / Warning check */}
-                {confirmDelete === log.id ? (
-                  <div className="flex items-center gap-1.5 shrink-0">
-                    <button onClick={() => handleDelete(log.id)} disabled={deleting === log.id}
-                      className="text-[9px] font-bold bg-red-50 text-red-600 border border-red-200 px-2 py-1 rounded-lg hover:bg-red-100 transition-colors min-w-[40px] cursor-pointer">
-                      {deleting === log.id ? '...' : 'YES'}
-                    </button>
-                    <button onClick={() => setConfirmDelete(null)}
-                      className="text-[9px] font-bold text-slate-400 hover:text-slate-700 px-1.5 py-1 rounded cursor-pointer">NO</button>
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => setConfirmDelete(log.id)}
-                    className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all cursor-pointer"
-                    aria-label="Delete entry"
-                  >
+                {/* Delete button */}
+                <button
+                  onClick={() => setLogToDelete(log)}
+                  disabled={deleting === log.id}
+                  className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all cursor-pointer"
+                  aria-label="Delete entry"
+                >
+                  {deleting === log.id ? (
+                    <motion.span animate={{ rotate: 360 }} transition={{ duration: 0.6, repeat: Infinity, ease: 'linear' }}
+                      className="inline-block w-4 h-4 border-2 border-slate-200 border-t-red-500 rounded-full" />
+                  ) : (
                     <IoTrash size={13} />
-                  </button>
-                )}
+                  )}
+                </button>
               </div>
             </motion.div>
           ))}
@@ -350,6 +345,42 @@ const ManifestLog = ({ uid, selectedDate, setSelectedDate, profile }) => {
               >
                 DISMISS CALENDAR
               </button>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Custom Delete Confirmation Modal (Daily Log Purge) */}
+      <AnimatePresence>
+        {logToDelete && (
+          <>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setLogToDelete(null)}
+              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[80]" />
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
+              className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white border border-slate-200 rounded-2xl p-6 z-[90] max-w-xs w-full text-center shadow-2xl"
+            >
+              <span className="text-3xl block mb-2">⚠️</span>
+              <h4 className="text-sm font-extrabold text-slate-900 tracking-widest uppercase mb-2">PURGE RECORD?</h4>
+              <p className="text-[10px] text-slate-500 mb-5 uppercase leading-normal font-medium">
+                This action will delete the chronicle for "{logToDelete.foodName}" permanently.
+              </p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setLogToDelete(null)}
+                  className="flex-1 py-2.5 rounded-xl text-[11px] text-slate-500 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition-colors min-h-[40px] uppercase font-bold cursor-pointer"
+                >
+                  RETAIN
+                </button>
+                <button
+                  onClick={async () => {
+                    await handleDelete(logToDelete.id);
+                  }}
+                  className="flex-1 py-2.5 rounded-xl text-[11px] text-white bg-red-600 hover:bg-red-500 transition-colors min-h-[40px] uppercase font-bold shadow-lg shadow-red-500/20 cursor-pointer"
+                >
+                  {deleting === logToDelete.id ? 'WIPING...' : 'PURGE'}
+                </button>
+              </div>
             </motion.div>
           </>
         )}

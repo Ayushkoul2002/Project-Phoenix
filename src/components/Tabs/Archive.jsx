@@ -49,7 +49,14 @@ const Archive = ({ uid, profile }) => {
   const weightGoal = profile?.targetWeight || 49.0;
   const calorieTarget = profile?.calorieTarget || 2436;
   const challengeStart = profile?.updatedAt?.toDate ? profile.updatedAt.toDate() : (profile?.updatedAt ? new Date(profile.updatedAt) : new Date('2026-05-28'));
-  const challengeEnd = profile?.deadline ? new Date(profile.deadline) : new Date('2026-10-28');
+  const challengeEnd = (() => {
+    const deadlineStr = profile?.deadline || '2026-10-28';
+    if (deadlineStr.length === 10 && deadlineStr.includes('-')) {
+      const [year, month, day] = deadlineStr.split('-').map(Number);
+      return new Date(year, month - 1, day, 23, 59, 59);
+    }
+    return new Date(deadlineStr);
+  })();
 
   const handleLogWeight = async (e) => {
     e.preventDefault();
@@ -195,12 +202,19 @@ const Archive = ({ uid, profile }) => {
             <LineChart data={weightChartData} onClick={() => {}} margin={{ top: 5, right: 5, bottom: 5, left: -22 }} className="outline-none focus:outline-none" style={{ outline: 'none' }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
               <XAxis dataKey="date" tick={{ fontSize: 8, fontFamily: 'sans-serif', fontWeight: '600', fill: '#94a3b8' }} axisLine={{ stroke: '#cbd5e1' }} tickLine={false} />
-              <YAxis tick={{ fontSize: 8, fontFamily: 'sans-serif', fontWeight: '600', fill: '#94a3b8' }} axisLine={{ stroke: '#cbd5e1' }} tickLine={false} domain={['dataMin - 1', 'dataMax + 1']} />
+              <YAxis tick={{ fontSize: 8, fontFamily: 'sans-serif', fontWeight: '600', fill: '#94a3b8' }} axisLine={{ stroke: '#cbd5e1' }} tickLine={false} domain={['dataMin - 3', 'dataMax + 3']} />
               <Tooltip content={<WeightTooltip />} wrapperStyle={{ pointerEvents: 'none' }} />
               <ReferenceLine y={weightGoal} stroke="#06b6d4" strokeDasharray="6 4" strokeWidth={1} />
               <Line type="monotone" dataKey="weight" stroke="#10b981" strokeWidth={2} dot={{ r: 3.5, fill: '#10b981', stroke: '#ffffff', strokeWidth: 2 }}
                 style={{ filter: 'drop-shadow(0 2px 6px rgba(16,185,129,0.2))' }}>
-                <LabelList dataKey="weight" position="top" offset={8} formatter={(v) => `${v}kg`}
+                <LabelList dataKey="weight" position="top" offset={8} 
+                  formatter={(v, entry, index) => {
+                    // Always show on first and last point
+                    if (index === 0 || index === weightChartData.length - 1) return `${v}kg`;
+                    // Show other intermediate points only if total points <= 6 to prevent overlapping
+                    if (weightChartData.length <= 6) return `${v}kg`;
+                    return '';
+                  }}
                   style={{ fontSize: 8, fontFamily: 'sans-serif', fontWeight: '800', fill: '#047857' }} />
               </Line>
             </LineChart>
