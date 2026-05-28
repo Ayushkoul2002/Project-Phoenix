@@ -63,8 +63,19 @@ const MissionControl = ({ uid, selectedDate, profile }) => {
   const proteinPercent = Math.min((todayPro / proteinTarget) * 100, 100);
 
   const latestWeight = weightLogs.length > 0 ? weightLogs[weightLogs.length - 1].weight : weightStart;
-  const weightProgress = Math.max(0, Math.min(100, ((latestWeight - weightStart) / (weightGoal - weightStart)) * 100));
-  const weightToGo = (weightGoal - latestWeight).toFixed(1);
+  const isBulk = weightGoal >= weightStart;
+  const isGoalCrushed = isBulk ? (latestWeight >= weightGoal) : (latestWeight <= weightGoal);
+  
+  let weightProgress = 0;
+  if (isGoalCrushed) {
+    weightProgress = 100;
+  } else {
+    const totalDelta = weightGoal - weightStart;
+    const currentDelta = latestWeight - weightStart;
+    weightProgress = totalDelta === 0 ? 100 : Math.max(0, Math.min(100, (currentDelta / totalDelta) * 100));
+  }
+
+  const weightToGoValue = Math.abs(weightGoal - latestWeight).toFixed(1);
 
   const totalCalEver = allFoodLogs.reduce((s, l) => s + (l.calories || 0), 0);
   const totalMeals = allFoodLogs.length;
@@ -181,7 +192,11 @@ const MissionControl = ({ uid, selectedDate, profile }) => {
             </div>
             <div className="flex justify-between items-center mt-1.5">
               <span className="text-[8px] font-bold text-slate-400">{weightStart}kg</span>
-              <span className="text-[8px] font-bold text-slate-450">{weightToGo}kg left</span>
+              {isGoalCrushed ? (
+                <span className="text-[8px] font-black text-emerald-600 animate-pulse">✓ GOAL CRUSHED! 🎉</span>
+              ) : (
+                <span className="text-[8px] font-bold text-slate-450">{weightToGoValue}kg left</span>
+              )}
             </div>
           </div>
         </div>

@@ -91,8 +91,20 @@ const Archive = ({ uid, profile }) => {
   const latestWeight = weightLogs.length > 0 ? weightLogs[weightLogs.length - 1].weight : weightStart;
   const firstWeight = weightLogs.length > 0 ? weightLogs[0].weight : weightStart;
   const totalGain = (latestWeight - firstWeight).toFixed(1);
-  const weightToGo = (weightGoal - latestWeight).toFixed(1);
-  const weightPct = Math.max(0, Math.min(100, ((latestWeight - weightStart) / (weightGoal - weightStart)) * 100));
+
+  const isBulk = weightGoal >= weightStart;
+  const isGoalCrushed = isBulk ? (latestWeight >= weightGoal) : (latestWeight <= weightGoal);
+  
+  let weightPct = 0;
+  if (isGoalCrushed) {
+    weightPct = 100;
+  } else {
+    const totalDelta = weightGoal - weightStart;
+    const currentDelta = latestWeight - weightStart;
+    weightPct = totalDelta === 0 ? 100 : Math.max(0, Math.min(100, (currentDelta / totalDelta) * 100));
+  }
+
+  const weightToGoValue = Math.abs(weightGoal - latestWeight).toFixed(1);
 
   const now = new Date();
   const daysSince = Math.max(1, Math.floor((now - challengeStart) / 86400000));
@@ -147,7 +159,11 @@ const Archive = ({ uid, profile }) => {
         </div>
         <div className="flex justify-between">
           <span className="text-[8px] font-bold text-slate-450">{weightStart}kg start</span>
-          <span className="text-[8px] font-extrabold text-emerald-600">{weightToGo}kg to reach goal</span>
+          {isGoalCrushed ? (
+            <span className="text-[8px] font-black text-emerald-600 animate-pulse">✓ GOAL CRUSHED! 🎉</span>
+          ) : (
+            <span className="text-[8px] font-extrabold text-emerald-600">{weightToGoValue}kg to reach goal</span>
+          )}
           <span className="text-[8px] font-bold text-slate-455">{weightGoal}kg goal</span>
         </div>
       </div>
@@ -175,8 +191,8 @@ const Archive = ({ uid, profile }) => {
       {weightChartData.length > 0 && (
         <div className="bg-white border border-slate-200 rounded-3xl p-5 mb-5 shadow-sm">
           <span className="text-[9px] font-bold text-slate-400 tracking-wider block uppercase mb-4">Weight History Graph</span>
-          <ResponsiveContainer width="100%" height={140}>
-            <LineChart data={weightChartData} margin={{ top: 5, right: 5, bottom: 5, left: -22 }}>
+          <ResponsiveContainer width="100%" height={140} className="outline-none focus:outline-none" style={{ outline: 'none' }}>
+            <LineChart data={weightChartData} onClick={() => {}} margin={{ top: 5, right: 5, bottom: 5, left: -22 }} className="outline-none focus:outline-none" style={{ outline: 'none' }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
               <XAxis dataKey="date" tick={{ fontSize: 8, fontFamily: 'sans-serif', fontWeight: '600', fill: '#94a3b8' }} axisLine={{ stroke: '#cbd5e1' }} tickLine={false} />
               <YAxis tick={{ fontSize: 8, fontFamily: 'sans-serif', fontWeight: '600', fill: '#94a3b8' }} axisLine={{ stroke: '#cbd5e1' }} tickLine={false} domain={['dataMin - 1', 'dataMax + 1']} />
@@ -193,8 +209,8 @@ const Archive = ({ uid, profile }) => {
       {calChartData.length > 0 && (
         <div className="bg-white border border-slate-200 rounded-3xl p-5 mb-5 shadow-sm">
           <span className="text-[9px] font-bold text-slate-400 tracking-wider block uppercase mb-4">Daily Caloric Chronology</span>
-          <ResponsiveContainer width="100%" height={130}>
-            <AreaChart data={calChartData} margin={{ top: 5, right: 5, bottom: 5, left: -22 }}>
+          <ResponsiveContainer width="100%" height={130} className="outline-none focus:outline-none" style={{ outline: 'none' }}>
+            <AreaChart data={calChartData} onClick={() => {}} margin={{ top: 5, right: 5, bottom: 5, left: -22 }} className="outline-none focus:outline-none" style={{ outline: 'none' }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
               <XAxis dataKey="date" tick={{ fontSize: 8, fontFamily: 'sans-serif', fontWeight: '600', fill: '#94a3b8' }} axisLine={{ stroke: '#cbd5e1' }} tickLine={false} />
               <YAxis tick={{ fontSize: 8, fontFamily: 'sans-serif', fontWeight: '600', fill: '#94a3b8' }} axisLine={{ stroke: '#cbd5e1' }} tickLine={false} />
